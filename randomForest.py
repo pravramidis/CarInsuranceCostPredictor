@@ -53,9 +53,6 @@ labels = data['PREMIUM']
 
 features_preprocessed = preprocessor.fit_transform(features)
 
-#pytorch tensors
-
-
 X_train, X_test, y_train, y_test = train_test_split(features_preprocessed, labels, test_size=0.2, random_state=42)
 
 from sklearn.ensemble import RandomForestRegressor
@@ -69,7 +66,7 @@ rf_regressor.fit(X_train, y_train)
 from joblib import dump, load
 
 # Save the trained model to a file
-model_filename = "random_forest_model.joblib"
+model_filename = "random_forest_model_3.joblib"
 dump(rf_regressor, model_filename)
 
 # Predict on test set
