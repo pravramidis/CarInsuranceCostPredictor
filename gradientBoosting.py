@@ -17,6 +17,7 @@ from xgboost import XGBRegressor
 from sklearn.ensemble import GradientBoostingRegressor  # Changed
 from sklearn.metrics import mean_squared_error, mean_absolute_error
 import joblib
+import datetime
 
 #using gpu
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -31,10 +32,22 @@ data2 = pd.read_csv(filename2)
 
 data = pd.concat([data1, data2])
 
+
+
 # Convert "INSR_BEGIN" column to datetime format
 data['INSR_BEGIN'] =  pd.to_datetime(data['INSR_BEGIN'], format='%d-%b-%y')
 # Extract year from "INSR_BEGIN" column
 data['INSR_BEGIN_YEAR'] = data['INSR_BEGIN'].dt.year
+
+#new code
+data['INSR_END'] = pd.to_datetime(data['INSR_END'], format='%d-%b-%y')
+data['INSR_DURATION'] = data['INSR_END'] - data['INSR_BEGIN']
+data['INSR_DURATION_MONTHS'] = data['INSR_DURATION'] / pd.Timedelta(days=30.436875)  # Approximate average number of days in a month
+
+# Round the duration to the nearest whole number of months
+data['INSR_DURATION_MONTHS'] = data['INSR_DURATION_MONTHS'].round().astype(int)
+current_year = datetime.datetime.now().year
+data['AGE_VEHICLE'] = current_year - data['PROD_YEAR']
 
 data['Month'] = data['INSR_BEGIN'].dt.month
 
@@ -47,12 +60,12 @@ def get_season(month):
     elif 9 <= month <= 11:
         return 'Autumn'
     else:
-        return 'Winter'
+        return 'Winter' 
 
 # Map month to season
 data['SEASON'] = data['Month'].apply(get_season)
 
-columnsToUse = ['SEX','INSURED_VALUE', 'USAGE', 'PROD_YEAR', 'TYPE_VEHICLE', 'PREMIUM','MAKE', 'INSR_BEGIN_YEAR', 'SEASON', 'SEATS_NUM']
+columnsToUse = ['SEX','INSURED_VALUE', 'USAGE', 'AGE_VEHICLE', 'TYPE_VEHICLE', 'PREMIUM','MAKE', 'INSR_BEGIN_YEAR', 'SEASON', 'SEATS_NUM','INSR_DURATION_MONTHS']
 
 data = data[columnsToUse]
 
@@ -60,7 +73,7 @@ data = data[columnsToUse]
 data = data.dropna()
 
 categoricalColumns = ['SEX','USAGE', 'TYPE_VEHICLE', 'MAKE', 'SEASON']
-numericalColumns = ['INSURED_VALUE', 'PROD_YEAR', 'INSR_BEGIN_YEAR', 'SEATS_NUM']
+numericalColumns = ['INSURED_VALUE', 'AGE_VEHICLE', 'INSR_BEGIN_YEAR', 'SEATS_NUM', 'INSR_DURATION_MONTHS']
 
 
 
@@ -79,7 +92,7 @@ labels = data['PREMIUM']
 
 features_preprocessed = preprocessor.fit_transform(features)
 
-X_train, X_test, y_train, y_test = train_test_split(features_preprocessed, labels, test_size=0.3, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(features_preprocessed, labels, test_size=0.2, random_state=42)
 
 # Initialize Gradient Boosting Regressor
 xgb_regressor = XGBRegressor(n_estimators=1000, random_state=42, n_jobs=-1)
@@ -103,3 +116,7 @@ absolute_error = np.abs(y_test - y_pred)
 
 average_absolute_error = np.mean(absolute_error)
 print("Average Absolute Error:", average_absolute_error)
+
+# Calculate the percentage of predictions within 10% of the actual value
+percentage_within_set_percent = np.mean(absolute_error / y_test <= 0.1) * 100
+print("Percentage of predictions within 10% of the actual value:", percentage_within_set_percent)
