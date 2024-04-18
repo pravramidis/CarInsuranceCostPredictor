@@ -134,3 +134,21 @@ print("Average Absolute Error:", average_absolute_error)
 # Calculate the percentage of predictions within 10% of the actual value
 percentage_within_set_percent = np.mean(absolute_error / y_test <= 0.1) * 100
 print("Percentage of predictions within 10% of the actual value:", percentage_within_set_percent)
+
+# Get feature importances from the trained model
+feature_importances = xgb_regressor.feature_importances_
+
+# Get feature names after one-hot encoding
+encoded_categorical_features = list(preprocessor.named_transformers_['cat'].get_feature_names_out(categoricalColumns))
+
+# Concatenate numerical and encoded categorical feature names
+all_feature_names = numericalColumns + encoded_categorical_features
+
+# Create a DataFrame to display feature importances
+feature_importance_df = pd.DataFrame({'Feature': all_feature_names, 'Importance': feature_importances})
+
+# Sort the DataFrame by importance
+feature_importance_df = feature_importance_df.sort_values(by='Importance', ascending=False)
+
+# Display the feature importances
+print(feature_importance_df)
