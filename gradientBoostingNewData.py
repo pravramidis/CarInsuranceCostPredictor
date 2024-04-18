@@ -49,19 +49,46 @@ data['Age'] = contract_year - birthyear
 
 data['Distribution_channel'] = data['Distribution_channel'].astype(str)
 
+registration_year = data['Year_matriculation']
+data['Year_on_road'] = contract_year - registration_year
+
+last_renewal_day = pd.to_datetime(data['Date_last_renewal'], format='%d/%m/%Y')
+last_renewal_year = last_renewal_day.dt.year
+data['Last_renewal_year'] = last_renewal_year
+
+next_renewal_day = pd.to_datetime(data['Date_next_renewal'], format='%d/%m/%Y')
+next_renewal_year = next_renewal_day.dt.year
+data['Next_renewal_year'] = next_renewal_year
+
+policy_duration = next_renewal_year - last_renewal_year
+data['Policy_duration'] = policy_duration
+
+years_on_policy = last_renewal_year - contract_year
+data['Years_on_policy'] = years_on_policy
+
+distinct = years_on_policy.unique()
+print(distinct)
+
 
 
 print(data.columns)
-columnsToUse = ['Seniority', 'Premium', 'Type_risk', 'Area', 'Second_driver', 'Year_matriculation', 
-			'Value_vehicle', 'Age', 'Years_driving', 'Distribution_channel', 'N_claims_history', 'Power', 'Cylinder_capacity','Weight', 'Length', 'Type_fuel', 'Payment', 'Contract_year']
+columnsToUse = ['Seniority', 'Premium', 'Type_risk', 'Area', 'Second_driver', 'Year_on_road', 'R_Claims_history',
+			'Value_vehicle', 'Age', 'Years_driving', 'Distribution_channel', 'N_claims_history', 'Power', 'Cylinder_capacity',
+			'Weight', 'Length', 'Type_fuel', 'Payment', 'Contract_year']
 
 data = data[columnsToUse]
 
-#Remove rows with empty values. There aren't many of them so this doesn't affect the data
-data = data.dropna()
+#We fill the missing length value with the mean so we can use the rest of the row
+data['Length'].fillna(data['Length'].mean(), inplace=True)
+#We fill the missing fuel type with the most common type
+data['Type_fuel'].fillna(data['Type_fuel'].mode()[0], inplace=True)
+
+# Remove rows with empty values. There aren't many of them so this doesn't affect the data
+# data = data.dropna()
 
 categoricalColumns = ['Type_risk', 'Area', 'Second_driver', 'Distribution_channel', 'Type_fuel', 'Payment']
-numericalColumns = ['Seniority', 'Year_matriculation','Value_vehicle','Age', 'Years_driving', 'N_claims_history', 'Power', 'Cylinder_capacity', 'Weight', 'Length', 'Contract_year']
+numericalColumns = ['Seniority', 'Year_on_road','Value_vehicle','Age', 'Years_driving', 'N_claims_history', 'Power', 'Cylinder_capacity', 
+					'Weight', 'Length', 'Contract_year', 'R_Claims_history']
 
 
 
@@ -73,7 +100,6 @@ transformers=[
 
 
 data.info()
-
 
 features = data.drop(columns=['Premium'])
 labels = data['Premium']
