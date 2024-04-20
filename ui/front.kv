@@ -1,0 +1,95 @@
+ScreenManager:
+    LoginScreen:
+    MainScreen:
+
+<LoginScreen>:
+    name: "login"
+
+    MDCard:
+        size_hint: None, None
+        size: 300, 350
+        pos_hint: {"center_x": 0.5, "center_y": 0.4}
+        elevation: 10
+        padding: 25
+        spacing: 25
+
+        orientation: 'vertical'
+    
+        MDLabel:
+            id: welcome_label
+            font_size: '44sp'
+            text: "WELCOME"
+            bold: True
+            halign: 'center'
+            size_hint_y: None
+            height: self.texture_size[1] 
+            
+
+        MDTextField:
+            id: user  
+            ize_hint_x: None
+            width: 200
+            font_size: "18sp"
+            pos_hint: {"center_x": 0.5}
+                  
+            
+            MDTextFieldHintText:
+                text: "Username"
+
+            MDTextFieldTrailingIcon:
+                icon: "account"
+        
+        MDTextField:
+            id: password  
+            ize_hint_x: None
+            width: 200
+            font_size: "18sp"
+            pos_hint: {"center_x": 0.5}
+            password: True     
+            
+            MDTextFieldHintText:
+                text: "Password"
+
+            MDTextFieldTrailingIcon:
+                icon: "eye-off"
+
+        MDButton:
+            style: "filled"
+            pos_hint: {"center_x": 0.5}
+            on_release: 
+                app.root.current = "main"
+                root.manager.transition.direction = "left"
+
+            MDButtonText:
+                text: "LOG IN"
+                pos_hint: {"center_x": 0.5, "center_y": 0.5}
+
+        Widget:
+            size_hint_y: None
+            height: 10
+
+        
+            
+
+
+    
+
+
+
+<MainScreen>
+    name: "main"
+
+    BoxLayout:
+        orientation: "vertical"
+        size: root.width, root.height
+
+        Label:
+            text: "Second Screen"
+            font_size: 32
+
+        Button:
+            text: "Go back"
+            font_size: 32
+            on_release: 
+                app.root.current = "login"
+                root.manager.transition.direction = "right"
