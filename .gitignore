@@ -2,3 +2,11 @@
 *.joblib
 *.pkl
 *.pth
+catboost_info
+__pycache__
+*.aux
+*.fdb_latexmk
+*.log
+*.fls
+*.gz
+*.xdv
