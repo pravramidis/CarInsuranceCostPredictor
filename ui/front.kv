@@ -7,7 +7,7 @@ ScreenManager:
 
     MDCard:
         size_hint: None, None
-        size: 300, 350
+        size: 400, 450
         pos_hint: {"center_x": 0.5, "center_y": 0.4}
         elevation: 10
         padding: 25
@@ -24,6 +24,9 @@ ScreenManager:
             size_hint_y: None
             height: self.texture_size[1] 
             
+        Widget:
+            size_hint_y: None
+            height: 10    
 
         MDTextField:
             id: user  
@@ -39,6 +42,10 @@ ScreenManager:
             MDTextFieldTrailingIcon:
                 icon: "account"
         
+        Widget:
+            size_hint_y: None
+            height: 5
+
         MDTextField:
             id: password  
             ize_hint_x: None
@@ -79,17 +86,111 @@ ScreenManager:
 <MainScreen>
     name: "main"
 
-    BoxLayout:
-        orientation: "vertical"
-        size: root.width, root.height
+    MDCard:
+        size_hint: None, None
+        size: 750, 450
+        pos_hint: {"center_x": 0.5, "center_y": 0.5}
 
-        Label:
-            text: "Second Screen"
-            font_size: 32
 
-        Button:
-            text: "Go back"
-            font_size: 32
-            on_release: 
-                app.root.current = "login"
-                root.manager.transition.direction = "right"
+        BoxLayout:
+            orientation: 'vertical'
+            padding: 20
+            spacing: 20
+
+            MDLabel:
+                text: "Please fill in the client's information:"
+                bold: True
+                font_size: '18sp'
+                halign: 'center'
+                size_hint_y: None
+                height: self.texture_size[1]
+
+            MDGridLayout:
+                cols: 2
+                size: 750, 450
+                adaptive_height: True
+                padding: [30, 30]  # padding: [horizontal, vertical]
+                spacing: [30, 30]  # Increase vertical spacing
+            
+                pos_hint: {'center_x': 0.5, "center_y": 0.45}
+                
+                MDTextField:
+                    id: dob
+                    on_focus: root.show_date_picker(self, self.focus)
+                    size_hint_x: None
+                    mode: "outlined"
+                    width: 300
+                    MDTextFieldHintText:
+                        text: "Date of Birth"
+
+                    MDTextFieldTrailingIcon:
+                        icon: "calendar"
+                    
+                    MDTextFieldHelperText:
+                        text: "MM/DD/YYYY"
+                        mode: "persistent"
+                   
+                    
+                    
+                
+                MDTextField:
+                    id: licence_issue_date_field
+                    on_focus: root.show_date_picker(self, self.focus)  
+                    size_hint_x: None
+                    mode: "outlined"
+                    width: 300
+                    MDTextFieldHintText:
+                        text: "Licence Issue Date"
+
+                    MDTextFieldTrailingIcon:
+                        icon: "calendar"
+                    
+                    MDTextFieldHelperText:
+                        text: "MM/DD/YYYY"
+                        mode: "persistent"
+
+                MDTextField:
+                    id: area_field
+                    size_hint_x: None
+                    mode: "outlined"
+                    width: 300
+                    on_focus: if self.focus: app.root.get_screen('main').open_area_menu()
+
+                    MDTextFieldHintText:
+                        text: "Area"
+
+                    MDTextFieldTrailingIcon:
+                        icon: "map-marker"
+
+                MDTextField:
+                    size_hint_x: None
+                    mode: "outlined"
+                    width: 300
+                    MDTextFieldHintText:
+                        text: "Seniority"
+
+                MDButton:
+                    style: "filled"
+                    pos_hint: {"center_x": 0.5}
+                    on_release:
+                        app.root.current = "login"
+                        root.manager.transition.direction = "right"
+
+                    MDButtonText:
+                        text: "GO BACK"
+                        pos_hint: {"center_x": 0.5, "center_y": 0.5}
+
+                MDButton:
+                    style: "filled"
+                    pos_hint: {"center_x": 0.5}
+                    padding: 20
+                    on_release:
+                        app.root.current = "login"
+                        root.manager.transition.direction = "left"
+
+                    MDButtonText:
+                        text: "NEXT"
+                        pos_hint: {"center_x": 0.5, "center_y": 0.5}
+            
+            
+    
