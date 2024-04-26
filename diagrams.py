@@ -34,6 +34,10 @@ data = pd.read_csv(filename, sep=';')
 #Payment;Premium;Cost_claims_year;N_claims_year;N_claims_history;R_Claims_history;Type_risk;Area;
 #Second_driver;Year_matriculation;Power;Cylinder_capacity;Value_vehicle;N_doors;Type_fuel;Length;Weight
 
+last_renewal_day = pd.to_datetime(data['Date_last_renewal'], format='%d/%m/%Y')
+last_renewal_year = last_renewal_day.dt.year
+data['Last_renewal_year'] = last_renewal_year
+
 birthday =  pd.to_datetime(data['Date_birth'], format='%d/%m/%Y')
 birthyear = birthday.dt.year
 
@@ -41,20 +45,34 @@ contract_day = pd.to_datetime(data['Date_start_contract'], format='%d/%m/%Y')
 contract_year = contract_day.dt.year
 data['Contract_year'] = contract_year
 
+# Step 1: Group by ID and calculate the average premium
+avg_premium_per_id = data.groupby('ID')['Premium'].mean().reset_index()
+
+# Step 2: Merge the averages back into the original DataFrame
+data = data.merge(avg_premium_per_id, on='ID', suffixes=('', '_avg'))
+
+# Step 3: Replace the original premium values with the averages
+data['Premium'] = data['Premium_avg']
+
+# Step 4: Drop the auxiliary column if needed
+data.drop('Premium_avg', axis=1, inplace=True)
+
+
+data = data.sort_values(by=['ID', 'Last_renewal_year'], ascending=[True, False])
+
+# Drop duplicates keeping only the first occurrence (which will have the highest 'Contract_year' for each 'ID')
+data = data.drop_duplicates(subset='ID', keep='first')
+
 day_start_driving = pd.to_datetime(data['Date_driving_licence'], format='%d/%m/%Y')
 year_start = day_start_driving.dt.year
 
-data['Years_driving'] = contract_year - year_start
-data['Age'] = contract_year - birthyear
+data['Years_driving'] = last_renewal_year - year_start
+data['Age'] = last_renewal_year - birthyear
 
 data['Distribution_channel'] = data['Distribution_channel'].astype(str)
 
 registration_year = data['Year_matriculation']
-data['Year_on_road'] = contract_year - registration_year
-
-last_renewal_day = pd.to_datetime(data['Date_last_renewal'], format='%d/%m/%Y')
-last_renewal_year = last_renewal_day.dt.year
-data['Last_renewal_year'] = last_renewal_year
+data['Years_on_road'] = last_renewal_year - registration_year
 
 next_renewal_day = pd.to_datetime(data['Date_next_renewal'], format='%d/%m/%Y')
 next_renewal_year = next_renewal_day.dt.year
@@ -66,31 +84,37 @@ data['Policy_duration'] = policy_duration
 years_on_policy = last_renewal_year - contract_year
 data['Years_on_policy'] = years_on_policy
 
-distinct = years_on_policy.unique()
-print(distinct)
+# temp test
+# data['Years_driving'] = contract_year - year_start
+# data['Age'] = contract_year - birthyear
+# data['Years_on_road'] = contract_year - registration_year
+
+data['accidents'] = data['N_claims_history'] / (data['Years_on_policy'] + 1)
 
 
+#We combine the doors and the category into one column
+combined_values = data['Type_risk'].astype(str) + '_' + data['N_doors'].astype(str)
+data['Combined_doors_type'] = combined_values
 
-print(data.columns)
-columnsToUse = ['Seniority', 'Premium', 'Type_risk', 'Area', 'Second_driver', 'Year_on_road', 'R_Claims_history',
+columnsToUse = ['Seniority', 'Premium', 'Type_risk', 'Area', 'Second_driver', 'Years_on_road', 'R_Claims_history', 'Years_on_policy', 'accidents',
 			'Value_vehicle', 'Age', 'Years_driving', 'Distribution_channel', 'N_claims_history', 'Power', 'Cylinder_capacity',
-			'Weight', 'Length', 'Type_fuel', 'Payment', 'Contract_year']
+			'Weight', 'Length', 'Type_fuel', 'Payment', 'Contract_year', 'Policies_in_force', 'Lapse']
 
 data = data[columnsToUse]
 
+# data = data[(data['Type_risk'] == 3)]
+
 #We fill the missing length value with the mean so we can use the rest of the row
-data['Length'].fillna(data['Length'].mean(), inplace=True)
+# data['Length'].fillna(data['Length'].mean(), inplace=True)
 #We fill the missing fuel type with the most common type
-data['Type_fuel'].fillna(data['Type_fuel'].mode()[0], inplace=True)
+# data['Type_fuel'].fillna(data['Type_fuel'].mode()[0], inplace=True)
 
 # Remove rows with empty values. There aren't many of them so this doesn't affect the data
 # data = data.dropna()
 
 categoricalColumns = ['Type_risk', 'Area', 'Second_driver', 'Distribution_channel', 'Type_fuel', 'Payment']
-numericalColumns = ['Seniority', 'Year_on_road','Value_vehicle','Age', 'Years_driving', 'N_claims_history', 'Power', 'Cylinder_capacity', 
-					'Weight', 'Length', 'Contract_year', 'R_Claims_history']
-
-
+numericalColumns = ['Seniority', 'Years_on_road','Value_vehicle','Age', 'Years_driving', 'N_claims_history', 'Power', 'Cylinder_capacity', 
+					'Weight', 'Length', 'Contract_year', 'R_Claims_history', 'Years_on_policy', 'accidents', 'Policies_in_force', 'Lapse']
 
 preprocessor = ColumnTransformer(
 transformers=[
@@ -205,30 +229,52 @@ def add_stats_to_plot(ax, data):
 # plot_premium_by_type_risk(data, 4)  # For Type_risk = 4
 # List of categorical features
 # List of categorical features
-categorical_features = ['Type_risk', 'Area', 'Second_driver', 'Distribution_channel', 'Type_fuel', 'Payment']
+# categorical_features = ['Type_risk','Payment', 'Distribution_channel', 'Area', 'Second_driver']
 
-# Numerical feature to visualize
-numerical_feature = 'Premium'
+# # Numerical feature to visualize
+# numerical_feature = 'Premium'
 
-# Loop through each categorical feature and create a swarm plot
-for feature in categorical_features:
-    plt.figure(figsize=(12, 8))  # Adjust figure size as needed
+# # Loop through each categorical feature and create a swarm plot
+# for feature in categorical_features:
+#     plt.figure(figsize=(12, 8))  # Adjust figure size as needed
 
-    # Create a swarm plot
-    sns.stripplot(
-    x=feature,
-    y=numerical_feature,
-    data=data,
-    palette='viridis',
-    jitter=True  # Add jitter for better separation of points
-)
-    # Add title and labels
-    plt.title(f'Distribution of {numerical_feature} by {feature}', fontsize=14, pad=20)
-    plt.xlabel(feature, fontsize=12)
-    plt.ylabel(numerical_feature, fontsize=12)
+#     # Create a swarm plot
+#     sns.stripplot(
+#     x=feature,
+#     y=numerical_feature,
+#     data=data,
+#     palette='viridis',
+#     jitter=True  # Add jitter for better separation of points
+# )
+#     # Add title and labels
+#     plt.title(f'Distribution of {numerical_feature} by {feature}', fontsize=14, pad=20)
+#     plt.xlabel(feature, fontsize=12)
+#     plt.ylabel(numerical_feature, fontsize=12)
 
-    # Optional: Add grid lines for better readability
-    plt.grid(True, linestyle='--', alpha=0.6)
+#     # Optional: Add grid lines for better readability
+#     plt.grid(True, linestyle='--', alpha=0.6)
 
-    # Show the plot
-    plt.show()
+#     # Show the plot
+#     plt.show()
+
+# Plotting the distribution of the 'Length' feature
+plt.figure(figsize=(10, 6))
+ax_length = sns.histplot(data['Length'], kde=True, bins=20, color='blue')
+plt.title('Distribution of Length')
+plt.xlabel('Length')
+plt.ylabel('Frequency')
+# Add statistics to the plot
+add_stats_to_plot(ax_length, data['Length'])
+# Show the plot
+plt.show()
+
+# Plotting the distribution of the 'Age' feature
+plt.figure(figsize=(10, 6))
+ax_age = sns.histplot(data['Age'], kde=True, bins=20, color='orange')
+plt.title('Distribution of Age')
+plt.xlabel('Age')
+plt.ylabel('Frequency')
+# Add statistics to the plot
+add_stats_to_plot(ax_age, data['Age'])
+# Show the plot
+plt.show()
