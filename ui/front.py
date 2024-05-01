@@ -104,6 +104,42 @@ class MainScreen(Screen):
 
         date_dialog.open()
 
+class VehicleScreen(Screen):
+    def __init__(self, **kwargs):
+        super(VehicleScreen, self).__init__(**kwargs)
+                
+        
+        fl = FloatLayout()
+        bg = Image(source='main_background.png', allow_stretch=True, keep_ratio=False)
+        fl.add_widget(bg)
+        self.add_widget(fl)
+    
+    def open_type_menu(self):
+        if self.menu:
+            self.menu.open()
+
+    def on_enter(self):
+        # Assuming the TextField id is 'area_field' in your .kv file
+        type_field = self.ids.type_field
+        
+        menu_items = [
+            {"text": "Passenger Car", "on_release": lambda x="Passenger Car": self.set_item(x)},
+            {"text": "Motorbike", "on_release": lambda x="Motorbike": self.set_item(x)},
+            {"text": "Van", "on_release": lambda x="Van": self.set_item(x)},
+            {"text": "Agricultural Vehicle", "on_release": lambda x="Agricultural Vehicle": self.set_item(x)}
+        ]
+        
+        self.menu = MDDropdownMenu(
+            caller=type_field,  # Caller is now the TextField
+            items=menu_items,
+            width_mult=4,
+            position="bottom"
+        )
+
+    def set_item(self, text):
+        # This method sets the selected item's text to the TextField
+        self.ids.type_field.text = text
+        self.menu.dismiss()
 
 class ScreenManager(ScreenManager):
     pass
