@@ -7,11 +7,12 @@ ScreenManager:
 
     MDCard:
         size_hint: None, None
-        size: 400, 450
+        width: min(400, root.width * 0.5)
+        height: min(450, root.height * 0.6)
         pos_hint: {"center_x": 0.5, "center_y": 0.4}
         elevation: 10
-        padding: 25
-        spacing: 25
+        padding:[dp(25), min(dp(25), self.height * 0.05)]
+        spacing: min(dp(25), self.height * 0.05)
 
         orientation: 'vertical'
     
@@ -22,16 +23,21 @@ ScreenManager:
             bold: True
             halign: 'center'
             size_hint_y: None
-            height: self.texture_size[1] 
+            size_hint_x: None
+            width: self.parent.width - dp(50)
+            height: self.parent.height -  dp(350)  # Adjust the height to stay within the card
+             
             
         Widget:
             size_hint_y: None
-            height: 10    
+            height: min(dp(10), self.parent.height * 0.01)    
 
         MDTextField:
             id: user  
-            ize_hint_x: None
-            width: 200
+            size_hint_x: None
+            size_hint_y: None
+            height: self.parent.height *0.1
+            width: self.parent.width -dp(100)
             font_size: "18sp"
             pos_hint: {"center_x": 0.5}
                   
@@ -44,12 +50,12 @@ ScreenManager:
         
         Widget:
             size_hint_y: None
-            height: 5
+            height: dp(5)
 
         MDTextField:
             id: password  
-            ize_hint_x: None
-            width: 200
+            size_hint_x: None
+            width: self.parent.width -dp(100)
             font_size: "18sp"
             pos_hint: {"center_x": 0.5}
             password: True     
@@ -63,6 +69,7 @@ ScreenManager:
         MDButton:
             style: "filled"
             pos_hint: {"center_x": 0.5}
+            width: self.parent.width - dp(200)
             on_release: 
                 app.root.current = "main"
                 root.manager.transition.direction = "left"
@@ -73,7 +80,7 @@ ScreenManager:
 
         Widget:
             size_hint_y: None
-            height: 10
+            height: dp(10)
 
         
             
@@ -88,7 +95,7 @@ ScreenManager:
 
     MDCard:
         size_hint: None, None
-        size: 750, 450
+        size: 750,450        
         pos_hint: {"center_x": 0.5, "center_y": 0.5}
 
 
