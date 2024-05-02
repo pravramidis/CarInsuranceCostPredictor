@@ -186,6 +186,7 @@ ScreenManager:
                             icon: "map-marker"
 
                     MDTextField:
+                        id: seniority
                         size_hint_x: None
                         mode: "outlined"
                         width: grid.width/2 - dp(20)
@@ -295,6 +296,7 @@ ScreenManager:
                             icon: "gas-station"
                     
                     MDTextField:
+                        id: registration
                         size_hint_x: None
                         mode: "outlined"
                         width: grid.width/3 - dp(20)
@@ -311,6 +313,7 @@ ScreenManager:
                 
 
                     MDTextField:
+                        id: power
                         size_hint_x: None
                         mode: "outlined"
                         width: grid.width/3 - dp(20)
@@ -319,6 +322,7 @@ ScreenManager:
 
                         
                     MDTextField:
+                        id: cylinder
                         size_hint_x: None
                         mode: "outlined"
                         width: grid.width/3 - dp(20)
@@ -328,6 +332,7 @@ ScreenManager:
                     
 
                     MDTextField:
+                        id: weight
                         size_hint_x: None
                         mode: "outlined"
                         width: grid.width/3 - dp(20)
@@ -338,6 +343,7 @@ ScreenManager:
                             icon: "weight-kilogram"
 
                     MDTextField:
+                        id: length
                         size_hint_x: None
                         mode: "outlined"
                         width: grid.width/3 - dp(20)
@@ -348,6 +354,7 @@ ScreenManager:
                     
                     
                     MDTextField:
+                        id: value
                         size_hint_x: None
                         mode: "outlined"
                         width: grid.width/3 - dp(20)
@@ -431,7 +438,7 @@ ScreenManager:
                     pos_hint: {'center_x': 0.5, "center_y": 0.45}
                 
                     MDTextField:
-                        id: start_date_field
+                        id: start_contract
                         on_focus: root.on_text_field_focus(self, self.focus)
                         size_hint_x: None
                         mode: "outlined"
@@ -447,7 +454,7 @@ ScreenManager:
                             mode: "persistent"
 
                     MDTextField:
-                        id: start_date_field
+                        id: last_renewal
                         on_focus: root.on_text_field_focus(self, self.focus)  
                         size_hint_x: None
                         mode: "outlined"
@@ -463,7 +470,7 @@ ScreenManager:
                             mode: "persistent"
                     
                     MDTextField:
-                        id: start_date_field
+                        id: next_renewal
                         on_focus: root.on_text_field_focus(self, self.focus) 
                         size_hint_x: None
                         mode: "outlined"
@@ -517,6 +524,7 @@ ScreenManager:
                             icon: "cash"
 
                     MDTextField:
+                        id: claims
                         size_hint_x: None
                         mode: "outlined"
                         width: grid.width/3 - dp(20)
@@ -528,6 +536,7 @@ ScreenManager:
                             icon: "car"
 
                     MDTextField:
+                        id: policies
                         size_hint_x: None
                         mode: "outlined"
                         width: grid.width/3 - dp(20)
@@ -540,6 +549,7 @@ ScreenManager:
 
 
                     MDTextField:
+                        id: lapse
                         size_hint_x: None
                         mode: "outlined"
                         width: grid.width/3 - dp(20)
@@ -551,6 +561,7 @@ ScreenManager:
                             icon: "car"
 
                     MDTextField:
+                        id: ratio_claims
                         size_hint_x: None
                         mode: "outlined"
                         width: grid.width/3 - dp(20)
@@ -582,7 +593,7 @@ ScreenManager:
                         pos_hint: {"center_x": 0.5}
                         padding: 10
                         on_release:
-                            app.root.current = "price"
+                            app.get_all_data()
                             root.manager.transition.direction = "left"
 
                         MDButtonText:

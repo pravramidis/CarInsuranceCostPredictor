@@ -108,6 +108,18 @@ class MainScreen(Screen, DatePickerMixin, DropdownMenuMixin):
         if value:  # if the text field is focused
             self.show_date_picker(instance,value)
     
+    def date_of_birth(self):
+        return self.ids.dob.text
+    
+    def licence_issue_date(self):
+        return self.ids.licence_issue_date_field.text
+    
+    def area(self):
+        return self.ids.area_field.text
+    
+    def seniority(self):
+        return self.ids.seniority.text
+    
 
 class VehicleScreen(Screen, DropdownMenuMixin):
     def __init__(self, **kwargs):
@@ -134,6 +146,30 @@ class VehicleScreen(Screen, DropdownMenuMixin):
             ]
         self.menu = self.create_menu(instance, menu_items)
         self.open_menu(self.menu) 
+    
+    def get_vehicle_type(self):
+        return self.ids.type_vehicle.text
+    
+    def get_fuel_type(self):
+        return self.ids.fuel_field.text
+    
+    def get_registration_year(self):
+        return self.ids.registration.text
+    
+    def get_horse_power(self):
+        return self.ids.power.text
+    
+    def get_cylinder_capacity(self):
+        return self.ids.cylinder.text
+    
+    def get_weight(self):
+        return self.ids.weight.text
+    
+    def get_length(self):
+        return self.ids.length.text
+    
+    def get_value(self):
+        return self.ids.value.text
     
 
 class InsuranceScreen(Screen, DatePickerMixin, DropdownMenuMixin):
@@ -168,18 +204,58 @@ class InsuranceScreen(Screen, DatePickerMixin, DropdownMenuMixin):
             ]
         self.menu = self.create_menu(instance, menu_items)
         self.open_menu(self.menu) 
+    
+    def get_start_contract(self):
+        return self.ids.start_contract.text
 
+    def get_last_renewal(self):
+        return self.ids.last_renewal.text
+    
+    def get_next_renewal(self):
+        return self.ids.next_renewal.text
+    
+    def get_driver(self):
+        return self.ids.driver.text
+    
+    def get_payment(self):
+        return self.ids.payment.text
+    
+    def get_channel(self):
+        return self.ids.channel.text
+    
+    def get_claims(self):
+        return self.ids.claims.text
+    
+    def get_policies(self):
+        return self.ids.policies.text
+    
+    def get_lapse(self):
+        return self.ids.lapse.text
+    
+    def get_ratio_claims(self):
+        return self.ids.ratio_claims.text
 
 
 class PriceScreen(Screen):
     def __init__(self, **kwargs):
         super(PriceScreen, self).__init__(**kwargs)
                 
-        
+        self.data = None
         fl = FloatLayout()
         bg = Image(source='main_background.png', allow_stretch=True, keep_ratio=False)
         fl.add_widget(bg)
         self.add_widget(fl)
+
+    
+
+    def receive_data(self, data):
+        self.data = data
+        date_of_birth = self.data["main_screen"]["date_of_birth"]
+        licence_issue_date = self.data["main_screen"]["licence_issue_date"]
+        area = self.data["main_screen"]["area"]
+        print(date_of_birth)
+        print(area)
+    
 
 class ScreenManager(ScreenManager):
     pass
@@ -191,6 +267,49 @@ class SafeWheels(MDApp):
         self.theme_cls.theme_style = "Light"
         self.theme_cls.primary_palette = "Blue"
         return Builder.load_file('front.kv')
+    
+    def get_all_data(self):
+        data = {}
+
+        main_screen = self.root.get_screen("main")
+        data["main_screen"] = {
+            "date_of_birth": main_screen.date_of_birth(),
+            "licence_issue_date": main_screen.licence_issue_date(),
+            "area": main_screen.area(),
+            "seniority": main_screen.seniority()
+        }
+
+        vehicle_screen = self.root.get_screen("vehicle")
+        data["vehicle_screen"] = {
+            "vehicle_type": vehicle_screen.get_vehicle_type(),
+            "fuel_type": vehicle_screen.get_fuel_type(),
+            "registration_year": vehicle_screen.get_registration_year(),
+            "horse_power": vehicle_screen.get_horse_power(),
+            "cylinder_capacity": vehicle_screen.get_cylinder_capacity(),
+            "weight": vehicle_screen.get_weight(),
+            "length": vehicle_screen.get_length(),
+            "value": vehicle_screen.get_value()
+        }
+
+        insurance_screen = self.root.get_screen("insurance")
+        data["insurance_screen"] = {
+            "start_contract": insurance_screen.get_start_contract(),
+            "last_renewal": insurance_screen.get_last_renewal(),
+            "next_renewal": insurance_screen.get_next_renewal(),
+            "drivers": insurance_screen.get_driver(),
+            "payment": insurance_screen.get_payment(),
+            "channel": insurance_screen.get_channel(),            
+            "claims": insurance_screen.get_claims(),
+            "policies": insurance_screen.get_policies(),
+            "lapse": insurance_screen.get_lapse(),
+            "ratio_claims": insurance_screen.get_ratio_claims()
+        }
+
+        price_screen = self.root.get_screen("price")
+        price_screen.receive_data(data)
+
+        # Navigate to the PriceScreen
+        self.root.current = "price"
 
 
 if __name__ == '__main__':
