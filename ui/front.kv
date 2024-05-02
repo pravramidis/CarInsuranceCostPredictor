@@ -2,6 +2,8 @@ ScreenManager:
     LoginScreen:
     MainScreen:
     VehicleScreen:
+    InsuranceScreen:
+    PriceScreen:
 
 <LoginScreen>:
     name: "login"
@@ -356,6 +358,8 @@ ScreenManager:
                         width: grid.width/3 - dp(20)
                         MDTextFieldHintText:
                             text: "Value"
+                        MDTextFieldTrailingIcon:
+                            icon: "cash"
                 
                 BoxLayout:
                     size_hint: 1,None
@@ -379,7 +383,7 @@ ScreenManager:
                         pos_hint: {"center_x": 0.5}
                         padding: 20
                         on_release:
-                            app.root.current = "vehicle"
+                            app.root.current = "insurance"
                             root.manager.transition.direction = "left"
 
                         MDButtonText:
@@ -387,7 +391,219 @@ ScreenManager:
                             pos_hint: {"center_x": 0.5, "center_y": 0.5}
 
                         
+<InsuranceScreen>
+    name: "insurance"
 
+    BoxLayout:
+        orientation: 'vertical'
+        padding: 20
+        spacing: 10
+        size_hint: 1,1
+
+        MDCard:
+            
+            size_hint: 0.9, None
+            padding:20
+            spacing:30
+            pos_hint: {"center_x": 0.5, "center_y": 0.6}
+            height: self.parent.height-dp(150)
+
+
+            BoxLayout:
+                id:card
+                orientation: 'vertical'
+                padding: 20
+                spacing: 20
+
+                MDLabel:
+                    text: "Please fill in the contract information:"
+                    bold: True
+                    font_size: '18sp'
+                    halign: 'center'
+                    size_hint_y: None
+                    size_hint_x: None
+                    width: self.parent.width - dp(50)
+                    height: card.parent.height -  dp(500)
+
+                MDGridLayout:
+                    id: grid
+                    cols: 3
+                    size_hint: 1, None
+                    adaptive_height: True
+                    padding: [10, 20]  # padding: [horizontal, vertical]
+                    spacing: [20, 20]  # Increase vertical spacing
+                
+                    pos_hint: {'center_x': 0.5, "center_y": 0.45}
+                
+                    MDTextField:
+                        id: start_date_field
+                        on_focus: root.show_date_picker(self, self.focus)  
+                        size_hint_x: None
+                        mode: "outlined"
+                        width: grid.width/3 - dp(20)
+                        MDTextFieldHintText:
+                            text: "Start Contract"
+
+                        MDTextFieldTrailingIcon:
+                            icon: "calendar"
+                        
+                        MDTextFieldHelperText:
+                            text: "MM/DD/YYYY"
+                            mode: "persistent"
+
+                    MDTextField:
+                        id: start_date_field
+                        on_focus: root.show_date_picker(self, self.focus)  
+                        size_hint_x: None
+                        mode: "outlined"
+                        width: grid.width/3 - dp(20)
+                        MDTextFieldHintText:
+                            text: "Last renewal"
+
+                        MDTextFieldTrailingIcon:
+                            icon: "calendar"
+                        
+                        MDTextFieldHelperText:
+                            text: "MM/DD/YYYY"
+                            mode: "persistent"
+                    
+                    MDTextField:
+                        id: start_date_field
+                        on_focus: root.show_date_picker(self, self.focus)  
+                        size_hint_x: None
+                        mode: "outlined"
+                        width: grid.width/3 - dp(20)
+                        MDTextFieldHintText:
+                            text: "Next renewal"
+
+                        MDTextFieldTrailingIcon:
+                            icon: "calendar"
+                        
+                        MDTextFieldHelperText:
+                            text: "MM/DD/YYYY"
+                            mode: "persistent"
+
+                    MDTextField:
+                        id: type_field
+                        size_hint_x: None
+                        mode: "outlined"
+                        width: grid.width/3 - dp(20)
+                        #on_focus: if self.focus: app.root.get_screen('vehicle').open_type_menu()
+
+                        MDTextFieldHintText:
+                            text: "Second driver"
+
+                        MDTextFieldTrailingIcon:
+                            icon: "account"
+
+                    MDTextField:
+                        id: type_field
+                        size_hint_x: None
+                        mode: "outlined"
+                        width: grid.width/3 - dp(20)
+                        #on_focus: if self.focus: app.root.get_screen('vehicle').open_type_menu()
+
+                        MDTextFieldHintText:
+                            text: "Distribution Chanel"
+
+                        
+
+                    MDTextField:
+                        id: type_field
+                        size_hint_x: None
+                        mode: "outlined"
+                        width: grid.width/3 - dp(20)
+                        #on_focus: if self.focus: app.root.get_screen('vehicle').open_type_menu()
+
+                        MDTextFieldHintText:
+                            text: "Payment"
+
+                        MDTextFieldTrailingIcon:
+                            icon: "cash"
+
+                    MDTextField:
+                        id: type_field
+                        size_hint_x: None
+                        mode: "outlined"
+                        width: grid.width/3 - dp(20)
+                        #on_focus: if self.focus: app.root.get_screen('vehicle').open_type_menu()
+
+                        MDTextFieldHintText:
+                            text: "Claims"
+
+                        MDTextFieldTrailingIcon:
+                            icon: "car"
+
+                    MDTextField:
+                        id: type_field
+                        size_hint_x: None
+                        mode: "outlined"
+                        width: grid.width/3 - dp(20)
+                        #on_focus: if self.focus: app.root.get_screen('vehicle').open_type_menu()
+
+                        MDTextFieldHintText:
+                            text: "Policies"
+
+                        MDTextFieldTrailingIcon:
+                            icon: "car"
+
+
+                    MDTextField:
+                        id: type_field
+                        size_hint_x: None
+                        mode: "outlined"
+                        width: grid.width/3 - dp(20)
+                        #on_focus: if self.focus: app.root.get_screen('vehicle').open_type_menu()
+
+                        MDTextFieldHintText:
+                            text: "Lapse"
+
+                        MDTextFieldTrailingIcon:
+                            icon: "car"
+
+                    MDTextField:
+                        id: type_field
+                        size_hint_x: None
+                        mode: "outlined"
+                        width: grid.width/3 - dp(20)
+                        #on_focus: if self.focus: app.root.get_screen('vehicle').open_type_menu()
+
+                        MDTextFieldHintText:
+                            text: "Ratio claims"
+
+                        MDTextFieldTrailingIcon:
+                            icon: "car"
+                BoxLayout:
+                    size_hint: 1,None
+                    pos_hint: {'center_x': 0.75, 'center_y': 0.5}
+                    height: dp(48)
+                    spacing: 50  # Add spacing between buttons
+                    padding: [dp(10), 0]
+                    MDButton:
+                        style: "filled"
+                        pos_hint: {"center_x": 0.5}
+                        on_release:
+                            app.root.current = "vehicle"
+                            root.manager.transition.direction = "right"
+
+                        MDButtonText:
+                            text: "GO BACK"
+                            pos_hint: {"center_x": 0.5, "center_y": 0.5}
+
+                    MDButton:
+                        style: "filled"
+                        pos_hint: {"center_x": 0.5}
+                        padding: 10
+                        on_release:
+                            app.root.current = "price"
+                            root.manager.transition.direction = "left"
+
+                        MDButtonText:
+                            text: "CALCULATE"
+                            pos_hint: {"center_x": 0.5, "center_y": 0.5}
+
+<PriceScreen>
+    name: "price"
 
 
             

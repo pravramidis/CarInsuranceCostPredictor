@@ -141,6 +141,66 @@ class VehicleScreen(Screen):
         self.ids.type_field.text = text
         self.menu.dismiss()
 
+class InsuranceScreen(Screen):
+    def __init__(self, **kwargs):
+        super(InsuranceScreen, self).__init__(**kwargs)
+                
+        
+        fl = FloatLayout()
+        bg = Image(source='main_background.png', allow_stretch=True, keep_ratio=False)
+        fl.add_widget(bg)
+        self.add_widget(fl)
+
+
+    def on_cancel(self, *args):
+        if self.date_dialog:
+            self.date_dialog.dismiss()
+
+    def on_ok(self, *args):
+        date_list = self.date_dialog.get_date()
+        if date_list:  # Check if the list is not empty
+            selected_date = date_list[0]  # Extract the first item (the date object)
+            formatted_date = selected_date.strftime('%m/%d/%Y')
+            print(formatted_date)
+        
+            self.ids.dob.text = formatted_date
+            self.ids.licence_issue_date_field.text = formatted_date
+
+            
+            
+            
+        print(self.date_dialog.get_date())
+        self.on_cancel()
+
+    def show_date_picker(self, widget, focus):
+        if not focus:
+            return
+        
+        
+        date_dialog = MDDockedDatePicker()
+        self.date_dialog = date_dialog
+        self.date_dialog.bind(
+            on_ok=self.on_ok,
+            on_cancel=self.on_cancel,
+        )
+        # Set the position based on the widget's properties
+        date_dialog.pos = [
+            widget.center_x - date_dialog.width / 2,
+            widget.y - (date_dialog.height - dp(142)),
+        ]
+        date_dialog.open()
+
+
+class PriceScreen(Screen):
+    def __init__(self, **kwargs):
+        super(PriceScreen, self).__init__(**kwargs)
+                
+        
+        fl = FloatLayout()
+        bg = Image(source='main_background.png', allow_stretch=True, keep_ratio=False)
+        fl.add_widget(bg)
+        self.add_widget(fl)
+
 class ScreenManager(ScreenManager):
     pass
 
