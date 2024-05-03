@@ -9,6 +9,7 @@
 \usepackage{accents}
 \usepackage{undertilde}
 \usepackage{fontspec}
+\usepackage{subcaption}
 
 % added this to stop hbadness warning
 \hbadness = 5000000
@@ -56,5 +57,72 @@
 Η εργασία μας επικεντρώνεται στην πρόβλεψη του κόστους ασφάλισης μηχανοκίνητων οχημάτων. Η ανάλυση αυτή αποτελεί ένα κρίσιμο ζήτημα στον τομέα της ασφάλισης, καθώς επιτρέπει στους ασφαλιστές να προσδιορίζουν με μεγαλύτερη ακρίβεια τα ασφαλιστικά ασφάλιστρα, λαμβάνοντας υπόψη διάφορους παράγοντες που επηρεάζουν το κόστος.
 Η διαδικασία της εργασίας ξεκινά με την προ-επεξεργασία των δεδομένων, κατά την οποία πραγματοποιήθηκε εξερευνητική ανάλυση (exploratory analysis) για τον προσδιορισμό των κριτηρίων διαχωρισμού των δεδομένων. Κατά τη διάρκεια αυτής της ανάλυσης, μετρήθηκε ο βαθμός επίδρασης κάθε χαρακτηριστικού (feature) του συνόλου δεδομένων στα αποτελέσματα. Με τη βοήθεια διαγραμμάτων, καταφέραμε να επιλέξουμε τον κατάλληλο διαχωρισμό των δεδομένων για περαιτέρω ανάλυση.
 Στη συνέχεια, η εργασία θα προχωρήσει στη δημιουργία και αξιολόγηση των μοντέλων πρόβλεψης, λαμβάνοντας υπόψη την είσοδο των χρηστών, ενώ θα ακολουθήσει η οπτικοποίηση και η αξιολόγηση των αποτελεσμάτων.
+
+
+\includegraphics[width=0.7\textwidth, keepaspectratio]{images/premium.png}
+
+
+% \begin{figure}[H]
+%     \centering
+    
+%     % First row
+%     \begin{subfigure}[b]{0.5\textwidth}
+%         \includegraphics[width=\linewidth]{images/premium_risk1.png}
+%         \caption{Motorbikes}
+%     \end{subfigure}
+%     \begin{subfigure}[b]{0.5\textwidth}
+%         \includegraphics[width=\linewidth]{images/premium_risk2.png}
+%         \caption{Vans}
+%     \end{subfigure}
+    
+%     % Add vertical space between rows
+%     \vspace{0.5cm}
+    
+%     % Second row
+%     \begin{subfigure}[b]{0.5\textwidth}
+%         \includegraphics[width=\linewidth]{images/premium_risk3.png}
+%         \caption{Passenger Cars}
+%     \end{subfigure}
+%     \begin{subfigure}[b]{0.5\textwidth}
+%         \includegraphics[width=\linewidth]{images/premium_risk4.png}
+%         \caption{Agricultural vehicles}
+%     \end{subfigure}
+    
+%     \caption{2x2 grid of images.}
+% \end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}{.5\textwidth}
+        \centering
+        \includegraphics[width=.8\linewidth]{images/premium_risk1.png} % Increased width
+        \caption{Motorbikes}
+    \end{subfigure}%
+    \begin{subfigure}{.5\textwidth}
+        \centering
+        \includegraphics[width=.8\linewidth]{images/premium_risk2.png} % Increased width
+        \caption{Vans}
+    \end{subfigure}
+   
+    \label{fig:test}
+\end{figure}
+	
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{.5\textwidth}
+        \centering
+        \includegraphics[width=.8\linewidth]{images/premium_risk3.png} % Increased width
+        \caption{Passenger Cars}
+  
+    \end{minipage}%
+    \begin{minipage}{.5\textwidth}
+        \centering
+        \includegraphics[width=.8\linewidth]{images/premium_risk4.png} % Increased width
+        \caption{Agricultural Vehicles}
+        
+    \end{minipage}
+    \caption{Comparison of Different Vehicle Types}
+\end{figure}
+
 
 \end{document}
