@@ -16,6 +16,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, mean_squared_error
 
 from sklearn.metrics import r2_score
+import joblib
 
 #using gpu
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -117,7 +118,7 @@ data.loc[null_indices, 'Type_fuel'] = 'Unknown'
 # Remove rows with empty values. There aren't many of them so this doesn't affect the data
 # data = data.dropna()
 
-categoricalColumns = ['Type_risk', 'Area', 'Second_driver', 'Distribution_channel', 'Type_fuel', 'Payment']
+categoricalColumns = [ 'Area', 'Second_driver', 'Distribution_channel', 'Type_fuel', 'Payment']
 numericalColumns = ['Seniority', 'Years_on_road','Value_vehicle','Age', 'Years_driving', 'N_claims_history', 'Power', 'Cylinder_capacity', 
 					'Weight', 'Length', 'Contract_year', 'R_Claims_history', 'Years_on_policy', 'accidents', 'Policies_in_force', 'Lapse']
 
@@ -159,10 +160,12 @@ for type_risk_value in type_risk_values:
     
     # Split the subset data into features and labels
     subset_features = subset_data.drop(columns=['Premium'])
+    subset_features = subset_data.drop(columns=['Type_risk'])
     subset_labels = subset_data['Premium']
-    
     # Preprocess features
     subset_features_preprocessed = preprocessor.fit_transform(subset_features)
+
+    joblib.dump(preprocessor, f"lightgbmModels\\preprocessor_{type_risk_value}.pkl")
     
     # Split data into train and test sets
     subset_X_train, subset_X_test, subset_y_train, subset_y_test = train_test_split(
@@ -180,6 +183,8 @@ for type_risk_value in type_risk_values:
     
     # Make predictions
     y_pred = model.predict(subset_X_test, num_iteration=model.best_iteration)
+
+    model.save_model(f"lightgbmModels\\model_{type_risk_value}.txt")
     
     # Evaluate the model
     mse = mean_squared_error(subset_y_test, y_pred)
