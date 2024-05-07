@@ -3,7 +3,6 @@ import torch
 from torch.utils.data import TensorDataset, DataLoader
 
 import numpy as np # linear algebra
-import seaborn as sns
 import matplotlib.pyplot as plt
 
 from sklearn.compose import ColumnTransformer

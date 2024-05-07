@@ -11,6 +11,8 @@ from kivymd.uix.menu import MDDropdownMenu
 from kivymd.uix.pickers import MDDockedDatePicker
 from kivy.metrics import dp
 
+import eval
+
 class DatePickerMixin:
     date_dialog = None
 
@@ -253,8 +255,6 @@ class PriceScreen(Screen):
         date_of_birth = self.data["main_screen"]["date_of_birth"]
         licence_issue_date = self.data["main_screen"]["licence_issue_date"]
         area = self.data["main_screen"]["area"]
-        print(date_of_birth)
-        print(area)
     
 
 class ScreenManager(ScreenManager):
