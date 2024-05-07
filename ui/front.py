@@ -150,7 +150,7 @@ class VehicleScreen(Screen, DropdownMenuMixin):
         self.open_menu(self.menu) 
     
     def get_vehicle_type(self):
-        return self.ids.type_vehicle.text
+        return self.ids.type_field.text
     
     def get_fuel_type(self):
         return self.ids.fuel_field.text
@@ -255,6 +255,7 @@ class PriceScreen(Screen):
         date_of_birth = self.data["main_screen"]["date_of_birth"]
         licence_issue_date = self.data["main_screen"]["licence_issue_date"]
         area = self.data["main_screen"]["area"]
+        eval.makePrediction(data)
     
 
 class ScreenManager(ScreenManager):
