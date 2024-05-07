@@ -255,7 +255,8 @@ class PriceScreen(Screen):
         date_of_birth = self.data["main_screen"]["date_of_birth"]
         licence_issue_date = self.data["main_screen"]["licence_issue_date"]
         area = self.data["main_screen"]["area"]
-        eval.makePrediction(data)
+        prediction = eval.makePrediction(data)
+        print(prediction)
     
 
 class ScreenManager(ScreenManager):
