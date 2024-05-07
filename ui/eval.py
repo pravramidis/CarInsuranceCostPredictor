@@ -44,9 +44,9 @@ def makePrediction(input):
 
 
     if ( input['insurance_screen']['channel'] == "Agent"):
-        data.at[0,'Distribution_channel'] = 0
+        data.at[0,'Distribution_channel'] = '0'
     else:
-        data.at[0,'Distribution_channel'] = 1
+        data.at[0,'Distribution_channel'] = '1'
 
 
     if ( input['insurance_screen']['payment'] == "Annual"):
@@ -93,7 +93,7 @@ def makePrediction(input):
     data['Years_driving'] = last_renewal_year - year_start
     data['Age'] = last_renewal_year - birthyear
 
-    registration_year = data['Year_matriculation']
+    registration_year = data['Year_matriculation'].astype(int)
     data['Years_on_road'] = last_renewal_year - registration_year
 
     next_renewal_day = pd.to_datetime(data['Date_next_renewal'], format='%d/%m/%Y')
@@ -106,7 +106,7 @@ def makePrediction(input):
     years_on_policy = last_renewal_year - contract_year
     data['Years_on_policy'] = years_on_policy
 
-    data['accidents'] = data['N_claims_history'] / (data['Years_on_policy'] + 1)
+    data['accidents'] = data['N_claims_history'].astype(int) / (data['Years_on_policy'] + 1)
 
     data['Age_Years_Driving_Interaction'] = data['Age'] * data['Years_driving']
 
