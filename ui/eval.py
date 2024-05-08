@@ -104,7 +104,6 @@ def makePrediction(input):
         data.at[0,'Cylinder_capacity'] = 1598
 
 
-
     if (data.at[0,'Policies_in_force'] == ''):
         data.at[0,'Policies_in_force'] = 1
 
@@ -116,38 +115,38 @@ def makePrediction(input):
 
     current_date = datetime.now()
     if (data.at[0,'Date_last_renewal'] == ''):
-        data.at[0,'Date_last_renewal'] = current_date.strftime('%d/%m/%Y')
+        data.at[0,'Date_last_renewal'] = current_date.strftime('%m/%d/%Y')
         
 
     if (data.at[0,'Date_next_renewal'] == ''):
-        data.at[0, 'Date_next_renewal'] = (current_date + pd.DateOffset(years=1)).strftime('%d/%m/%Y')
+        data.at[0, 'Date_next_renewal'] = (current_date + pd.DateOffset(years=1)).strftime('%m/%d/%Y')
 
     if (data.at[0,'Date_start_contract'] == ''):
-        data.at[0,'Date_start_contract'] = current_date.strftime('%d/%m/%Y') 
+        data.at[0,'Date_start_contract'] = current_date.strftime('%m/%d/%Y') 
 
     if (data.at[0,'Date_birth'] == ''):
-        data.at[0,'Date_birth'] = current_date.strftime('%d/%m/%Y')    
+        data.at[0,'Date_birth'] = current_date.strftime('%m/%d/%Y')    
 
     #Feature engineering
-    last_renewal_day = pd.to_datetime(data['Date_last_renewal'], format='%d/%m/%Y')
+    last_renewal_day = pd.to_datetime(data['Date_last_renewal'], format='%m/%d/%Y')
     last_renewal_year = last_renewal_day.dt.year
     data['Last_renewal_year'] = last_renewal_year
 
-    contract_day = pd.to_datetime(data['Date_start_contract'], format='%d/%m/%Y')
+    contract_day = pd.to_datetime(data['Date_start_contract'], format='%m/%d/%Y')
     contract_year = contract_day.dt.year
     data['Contract_year'] = contract_year
 
     if (data.at[0,'Date_driving_licence'] == ''):
        data['Years_driving'] =  24
     else:
-        day_start_driving = pd.to_datetime(data['Date_driving_licence'], format='%d/%m/%Y')
+        day_start_driving = pd.to_datetime(data['Date_driving_licence'], format='%m/%d/%Y')
         year_start = day_start_driving.dt.year
         data['Years_driving'] = last_renewal_year - year_start
 
     if (data.at[0,'Date_birth'] == ''): 
        data['Age'] = 47 
     else: 
-        birthday =  pd.to_datetime(data['Date_birth'], format='%d/%m/%Y')
+        birthday =  pd.to_datetime(data['Date_birth'], format='%m/%d/%Y')
         birthyear = birthday.dt.year
         data['Age'] = last_renewal_year - birthyear
 
@@ -155,7 +154,7 @@ def makePrediction(input):
     
     data['Years_on_road'] = last_renewal_year - registration_year
 
-    next_renewal_day = pd.to_datetime(data['Date_next_renewal'], format='%d/%m/%Y')
+    next_renewal_day = pd.to_datetime(data['Date_next_renewal'], format='%m/%d/%Y')
     next_renewal_year = next_renewal_day.dt.year
     data['Next_renewal_year'] = next_renewal_year
 
