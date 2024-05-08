@@ -1,107 +1,98 @@
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
-
 import pandas as pd
 import torch
 from torch.utils.data import TensorDataset, DataLoader
 
-import numpy as np # linear algebra
-import seaborn as sns
-import matplotlib.pyplot as plt
-
+import numpy as np
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_absolute_error, r2_score
 
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.metrics import accuracy_score
-from xgboost import XGBRegressor
-
-from sklearn.ensemble import GradientBoostingRegressor  # Changed
-from sklearn.metrics import mean_squared_error, mean_absolute_error
-import joblib
-import datetime
-
-#using gpu
+# Choose your device (GPU if available, otherwise CPU)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+filename = "Motor_vehicle_insurance_data.csv"
 
-filename = "motor_data11-14lats.csv"
-filename2 = "motor_data14-2018.csv"
+# Reading the CSV file
+data = pd.read_csv(filename, sep=';')
 
-#Reading the csv
-data1 = pd.read_csv(filename)
-data2 = pd.read_csv(filename2)
+# Feature engineering
+last_renewal_day = pd.to_datetime(data['Date_last_renewal'], format='%d/%m/%Y')
+last_renewal_year = last_renewal_day.dt.year
+data['Last_renewal_year'] = last_renewal_year
 
-data = pd.concat([data1, data2])
+birthday = pd.to_datetime(data['Date_birth'], format='%d/%m/%Y')
+birthyear = birthday.dt.year
 
+contract_day = pd.to_datetime(data['Date_start_contract'], format='%d/%m/%Y')
+contract_year = contract_day.dt.year
+data['Contract_year'] = contract_year
 
+avg_premium_per_id = data.groupby('ID')['Premium'].mean().reset_index()
+data = data.merge(avg_premium_per_id, on='ID', suffixes=('', '_avg'))
+data['Premium'] = data['Premium_avg']
+data.drop('Premium_avg', axis=1, inplace=True)
 
-# Convert "INSR_BEGIN" column to datetime format
-data['INSR_BEGIN'] =  pd.to_datetime(data['INSR_BEGIN'], format='%d-%b-%y')
-# Extract year from "INSR_BEGIN" column
-data['INSR_BEGIN_YEAR'] = data['INSR_BEGIN'].dt.year
+data.sort_values(by=['ID', 'Last_renewal_year'], ascending=[True, False], inplace=True)
+data.drop_duplicates(subset='ID', keep='first', inplace=True)
 
-#new code
-data['INSR_END'] = pd.to_datetime(data['INSR_END'], format='%d-%b-%y')
-data['INSR_DURATION'] = data['INSR_END'] - data['INSR_BEGIN']
-data['INSR_DURATION_MONTHS'] = data['INSR_DURATION'] / pd.Timedelta(days=30.436875)  # Approximate average number of days in a month
+day_start_driving = pd.to_datetime(data['Date_driving_licence'], format='%d/%m/%Y')
+year_start = day_start_driving.dt.year
 
-# Round the duration to the nearest whole number of months
-data['INSR_DURATION_MONTHS'] = data['INSR_DURATION_MONTHS'].round().astype(int)
-current_year = datetime.datetime.now().year
-data['AGE_VEHICLE'] = current_year - data['PROD_YEAR']
+data['Years_driving'] = last_renewal_year - year_start
+data['Age'] = last_renewal_year - birthyear
 
-data['Month'] = data['INSR_BEGIN'].dt.month
+data['Distribution_channel'] = data['Distribution_channel'].astype(str)
+registration_year = data['Year_matriculation']
+data['Years_on_road'] = last_renewal_year - registration_year
 
-# Define a function to map month to season
-def get_season(month):
-    if 3 <= month <= 5:
-        return 'Spring'
-    elif 6 <= month <= 8:
-        return 'Summer'
-    elif 9 <= month <= 11:
-        return 'Autumn'
-    else:
-        return 'Winter' 
+next_renewal_day = pd.to_datetime(data['Date_next_renewal'], format='%d/%m/%Y')
+next_renewal_year = next_renewal_day.dt.year
+data['Next_renewal_year'] = next_renewal_year
 
-# Map month to season
-data['SEASON'] = data['Month'].apply(get_season)
+policy_duration = next_renewal_year - last_renewal_year
+data['Policy_duration'] = policy_duration
 
-columnsToUse = ['SEX','INSURED_VALUE', 'USAGE', 'AGE_VEHICLE', 'TYPE_VEHICLE', 'PREMIUM','MAKE', 'INSR_BEGIN_YEAR', 'SEASON', 'SEATS_NUM','INSR_DURATION_MONTHS']
+years_on_policy = last_renewal_year - contract_year
+data['Years_on_policy'] = years_on_policy
+
+data['accidents'] = data['N_claims_history'] / (data['Years_on_policy'] + 1)
+data['Age_Years_Driving_Interaction'] = data['Age'] * data['Years_driving']
+
+combined_values = data['Type_risk'].astype(str) + '_' + data['N_doors'].astype(str)
+data['Combined_doors_type'] = combined_values
+
+columnsToUse = ['Seniority', 'Premium', 'Type_risk', 'Area', 'Second_driver', 'Years_on_road', 'R_Claims_history', 'Years_on_policy', 'accidents', 'Value_vehicle', 'Age', 'Years_driving', 'Distribution_channel', 'N_claims_history', 'Power', 'Cylinder_capacity', 'Weight', 'Length', 'Type_fuel', 'Payment', 'Contract_year', 'Policies_in_force', 'Lapse']
 
 data = data[columnsToUse]
 
-#Remove rows with empty values. There aren't many of them so this doesn't affect the data
-data = data.dropna()
+data['Length'] = data['Length'].fillna(data['Length'].mean())
+data.loc[data['Type_fuel'].isnull(), 'Type_fuel'] = 'Unknown'
 
-categoricalColumns = ['SEX','USAGE', 'TYPE_VEHICLE', 'MAKE', 'SEASON']
-numericalColumns = ['INSURED_VALUE', 'AGE_VEHICLE', 'INSR_BEGIN_YEAR', 'SEATS_NUM', 'INSR_DURATION_MONTHS']
-
-
+categoricalColumns = ['Area', 'Second_driver', 'Distribution_channel', 'Type_fuel', 'Payment']
+numericalColumns = ['Seniority', 'Years_on_road', 'Value_vehicle', 'Age', 'Years_driving', 'N_claims_history', 'Power', 'Cylinder_capacity', 'Weight', 'Length', 'Contract_year', 'R_Claims_history', 'Years_on_policy', 'accidents', 'Policies_in_force', 'Lapse']
 
 preprocessor = ColumnTransformer(
-transformers=[
-	('num', StandardScaler(), numericalColumns),
-	('cat', OneHotEncoder(), categoricalColumns)
-])
-
+    transformers=[
+        ('num', StandardScaler(), numericalColumns),
+        ('cat', OneHotEncoder(), categoricalColumns)
+    ]
+)
 
 data.info()
 
-
-features = data.drop(columns=['PREMIUM'])
-labels = data['PREMIUM']
+features = data.drop(columns=['Premium'])
+labels = data['Premium']
 
 features_preprocessed = preprocessor.fit_transform(features)
 
-
 X_train, X_test, y_train, y_test = train_test_split(features_preprocessed, labels, test_size=0.2, random_state=42)
 
-
 # Convert features and labels to PyTorch tensors
-X_train_tensor = torch.tensor(X_train.toarray(), dtype=torch.float32, device=device)
+X_train_tensor = torch.tensor(X_train, dtype=torch.float32, device=device)
 y_train_tensor = torch.tensor(y_train.values, dtype=torch.float32, device=device).unsqueeze(1)
 
 # Create a TensorDataset
@@ -114,29 +105,52 @@ epochs = 10
 # Create DataLoader
 train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 
-
 class NeuralNet(nn.Module):
-    def __init__(self, input_size, num_numerical_cols, embedding_sizes, output_size):
+    def __init__(self, input_size, num_numerical_cols, categorical_columns, data, output_size):
         super(NeuralNet, self).__init__()
         self.num_numerical_cols = num_numerical_cols
-        self.embeddings = nn.ModuleList([nn.Embedding(ni, nf) for ni, nf in embedding_sizes])
-        self.num_categorical_cols = sum((nf for ni, nf in embedding_sizes))
-        self.num_total_cols = self.num_categorical_cols + self.num_numerical_cols
-
-        self.fc1 = nn.Linear(self.num_total_cols, 256)  
-        self.fc2 = nn.Linear(256, 128)  
+        
+        # Initialize the embeddings
+        self.embeddings = nn.ModuleList()
+        for column in categorical_columns:
+            num_unique_values = len(data[column].unique()) + 1  # Adding 1 for unknown category
+            embedding_size = min(50, (num_unique_values + 1) // 2)  
+            self.embeddings.append(nn.Embedding(num_unique_values, embedding_size))
+        
+        self.num_categorical_cols = sum(e.embedding_dim for e in self.embeddings)
+        
+        # Total number of input features
+        total_input_size = self.num_numerical_cols + self.num_categorical_cols
+        
+        # Define fully connected layers
+        self.fc1 = nn.Linear(total_input_size, 256)
+        self.fc2 = nn.Linear(256, 128)
         self.fc3 = nn.Linear(128, 64)
         self.fc4 = nn.Linear(64, 32)
         self.fc5 = nn.Linear(32, 16)
         self.fc6 = nn.Linear(16, output_size)
+        
+        # Dropout layer
         self.dropout = nn.Dropout(0.2)
 
     def forward(self, x_numerical, x_categorical):
+        # Convert categorical data to LongTensor
+        x_categorical = x_categorical.long()
+        
+        # Process categorical input through the embedding layers
         embedded = []
-        for i, e in enumerate(self.embeddings):
-            embedded.append(e(x_categorical[:, i].long()))
-        x_categorical = torch.cat(embedded, 1)
-        x = torch.cat([x_numerical, x_categorical], 1)
+        for i, embedding in enumerate(self.embeddings):
+            # Process each categorical column through the corresponding embedding layer
+            cat_col = x_categorical[:, i]  # Select the i-th categorical column
+            embedded.append(embedding(cat_col))
+        
+        # Concatenate all embedded categorical features
+        x_categorical = torch.cat(embedded, dim=1)
+        
+        # Concatenate numerical and categorical features
+        x = torch.cat([x_numerical, x_categorical], dim=1)
+        
+        # Pass through the fully connected layers
         x = F.relu(self.fc1(x))
         x = self.dropout(x)
         x = F.relu(self.fc2(x))
@@ -148,71 +162,57 @@ class NeuralNet(nn.Module):
         x = F.relu(self.fc5(x))
         x = self.dropout(x)
         x = self.fc6(x)
+        
         return x
 
-
 # Define the sizes for embedding layers
-embedding_sizes = [(len(data[column].unique()), min(50, (len(data[column].unique()) + 1) // 2)) for column in categoricalColumns]
+embedding_sizes = [(len(data[column].unique()) + 1, min(50, (len(data[column].unique()) + 1) // 2)) for column in categoricalColumns]
 
 # Initialize the neural network
-input_size = X_train_tensor.shape[1]  # Number of features after preprocessing
-output_size = 1
-model = NeuralNet(input_size, len(numericalColumns), embedding_sizes, output_size).to(device)
+input_size = len(numericalColumns) + sum(embedding_size for _, embedding_size in embedding_sizes)
+output_size = 1  # For regression
+model = NeuralNet(input_size, len(numericalColumns), categoricalColumns, data, output_size).to(device)
 
 # Define loss function and optimizer
 criterion = nn.MSELoss()  # Mean Squared Error loss for regression
-optimizer = optim.Adam(model.parameters(), lr=0.001)  # Adam optimizer
-
-from sklearn.metrics import mean_absolute_error, r2_score
-
-# Define training loop
-# Define training loop
-# Create DataLoader
-train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+optimizer = optim.Adam(model.parameters(), lr=0.001)
 
 # Define training loop
 def train_model(model, criterion, optimizer, train_loader, epochs):
     model.train()  # Set the model to training mode
-    num_samples = len(train_loader.dataset)  # Get the number of samples
     for epoch in range(epochs):
         running_loss = 0.0
-        running_mae = 0.0
         predictions = []
         targets = []
-        for inputs, labels in train_loader:  # Iterate over batches from DataLoader
+        for inputs, labels in train_loader:
+            # Split inputs into numerical and categorical parts
             inputs_numerical = inputs[:, :len(numericalColumns)].to(device)
-            inputs_categorical = inputs[:, len(categoricalColumns):].to(device)
+            inputs_categorical = inputs[:, len(numericalColumns):].to(device)
             labels = labels.to(device)
 
-            optimizer.zero_grad()  # Zero the parameter gradients
-
+            # Zero the parameter gradients
+            optimizer.zero_grad()
+            
             # Forward pass
-            outputs = model(inputs_numerical, inputs_categorical)  # Pass both numerical and categorical inputs
-            loss = criterion(outputs, labels)  # Calculate the loss
-
+            outputs = model(inputs_numerical, inputs_categorical)
+            loss = criterion(outputs, labels)
+            
             # Backward pass and optimize
             loss.backward()
             optimizer.step()
-
+            
+            # Accumulate running loss
             running_loss += loss.item()
-
-            # Calculate MAE
+            
+            # Collect predictions and targets for metrics
             predictions.extend(outputs.cpu().detach().numpy())
             targets.extend(labels.cpu().detach().numpy())
 
-        # Calculate metrics
-        running_mae = mean_absolute_error(targets, predictions)
+        # Calculate and print metrics
+        mean_mae = mean_absolute_error(targets, predictions)
         r2 = r2_score(targets, predictions)
+        print(f"Epoch {epoch + 1}/{epochs}, Loss: {running_loss / len(train_loader):.4f}, MAE: {mean_mae:.4f}, R-squared: {r2:.4f}")
 
-        # Print average metrics for this epoch
-        print(f"Epoch {epoch+1}/{epochs}, Loss: {running_loss / num_samples}, MAE: {running_mae}, R-squared: {r2}")
-
-
-
-
-from sklearn.metrics import mean_absolute_error, mean_squared_error
-
-# Define evaluation function
 # Define evaluation function
 def evaluate_model(model, X_test, y_test):
     model.eval()  # Set the model to evaluation mode
@@ -221,9 +221,9 @@ def evaluate_model(model, X_test, y_test):
         numerical_features = X_test[:, :len(numericalColumns)]
         categorical_features = X_test[:, len(numericalColumns):]
 
-        # Convert to torch tensors
-        numerical_tensor = torch.tensor(numerical_features.toarray(), dtype=torch.float32, device=device)
-        categorical_tensor = torch.tensor(categorical_features.toarray(), dtype=torch.float32, device=device)
+        # Convert the numerical and categorical features directly to PyTorch tensors
+        numerical_tensor = torch.tensor(numerical_features, dtype=torch.float32, device=device)
+        categorical_tensor = torch.tensor(categorical_features, dtype=torch.long, device=device)
 
         # Pass both numerical and categorical inputs to the model
         outputs = model(numerical_tensor, categorical_tensor)
@@ -238,10 +238,7 @@ def evaluate_model(model, X_test, y_test):
         # Calculate Mean Absolute Error
         mae = mean_absolute_error(y_test, outputs.cpu().numpy())
         print(f"Mean Absolute Error on Test Set: {mae}")
-
-
-
-
+        
 # Train the model
 train_model(model, criterion, optimizer, train_loader, epochs)
 
@@ -253,9 +250,4 @@ model_path = 'trained_model.pth'
 
 # Save the model's state dictionary
 torch.save(model.state_dict(), model_path)
-
 print(f"Model saved to {model_path}")
-
-
-
-
