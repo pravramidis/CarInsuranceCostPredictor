@@ -3,7 +3,6 @@ import torch
 from torch.utils.data import TensorDataset, DataLoader
 
 import numpy as np # linear algebra
-import matplotlib.pyplot as plt
 
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
@@ -12,11 +11,12 @@ from sklearn.model_selection import train_test_split
 from sklearn.ensemble import GradientBoostingRegressor  # Changed
 from sklearn.metrics import mean_squared_error, mean_absolute_error
 
-from sklearn.ensemble import RandomForestRegressor
+import xgboost as xgb
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, mean_squared_error
 
 from sklearn.metrics import r2_score
+import matplotlib.pyplot as plt
 
 #using gpu
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -143,26 +143,24 @@ features_preprocessed = preprocessor.fit_transform(features)
 
 X_train, X_test, y_train, y_test = train_test_split(features_preprocessed, labels, test_size=0.2, random_state=42)
 
-
 params = {
-    'objective': 'regression',  # or 'binary' for binary classification
-    'metric': 'rmse',           # or other evaluation metrics
-    'num_leaves': 31,
+    'objective': 'reg:squarederror',  # or 'binary:logistic' for binary classification
+    'eval_metric': 'rmse', 
     'learning_rate': 0.05,
-    'feature_fraction': 0.9,
-    'bagging_fraction': 0.8,
-    'bagging_freq': 5,
-    'verbose': -1,
-    'n_jobs': -1
+    'max_depth': 6,
+    'min_child_weight': 1,
+    'subsample': 0.8,
+    'colsample_bytree': 0.8,
+    'n_estimators': 1000,
+    'seed': 42
 }
 
-
-model = RandomForestRegressor(n_estimators=1000, random_state=42)
-    
+# XGBoost model training
+model = xgb.XGBRegressor(**params)
 model.fit(X_train, y_train)
 
-    
-# Make predictions
+
+# Predictions
 y_pred = model.predict(X_test)
 
 # Calculate Mean Squared Error
@@ -188,6 +186,7 @@ encoded_categorical_features = list(preprocessor.named_transformers_['cat'].get_
 
 # Combine numerical and encoded categorical feature names
 all_feature_names = numericalColumns + encoded_categorical_features
+percentage_within_thresholds = {type_risk_value: {} for type_risk_value in data['Type_risk'].unique()}
 
 # Define a function to evaluate model performance for each risk type
 def evaluate_model_by_feature(model, X_test, y_test, risk_types):
@@ -209,14 +208,38 @@ def evaluate_model_by_feature(model, X_test, y_test, risk_types):
         print(f"Metrics for {risk_type} Risk Type:")
         print(f"Mean Squared Error: {mse}")
         print(f"Mean Absolute Error: {mae}")
+        thresholds_percentages = {}
         for threshold in [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]:
             percentage_within_threshold = np.mean(absolute_error_risk_type / y_test_risk_type <= threshold / 100) * 100
+            thresholds_percentages[threshold] = percentage_within_threshold
             print(f"Percentage of predictions within {threshold}% of the actual value for Type_risk {risk_type}: {percentage_within_threshold}")
+        percentage_within_thresholds[risk_type] = thresholds_percentages
 
-        print(f"Percentage of predictions within {threshold}% of the actual value: {percentage_within_threshold}")
-        print()  # Add an empty line for better readability
+    return percentage_within_thresholds
         
 
 risk_types = data['Type_risk'].unique()
-evaluate_model_by_feature(model, X_test, y_test, risk_types)
+# Call the function and store the returned values
+percentage_within_thresholds_by_risk = evaluate_model_by_feature(model, X_test, y_test, risk_types)
 
+# Calculate the percentage within threshold for the whole dataset
+all_thresholds = {}
+for threshold in [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]:
+    percentage_within_threshold = np.mean(absolute_error / y_test <= threshold / 100) * 100
+    all_thresholds[threshold] = percentage_within_threshold
+
+# Store the thresholds for the whole dataset
+percentage_within_thresholds_by_risk['All'] = all_thresholds
+
+# Plotting
+for risk_type, thresholds in percentage_within_thresholds_by_risk.items():
+    plt.plot(thresholds.keys(), thresholds.values(), label=f'Type_risk {risk_type}')
+
+
+
+plt.xlabel('Threshold (%)')
+plt.ylabel('Percentage of Predictions within Threshold')
+plt.title('Percentage of Predictions within Different Thresholds for Each Type_risk')
+plt.legend()
+plt.grid(True)
+plt.show()

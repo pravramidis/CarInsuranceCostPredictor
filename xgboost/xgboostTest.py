@@ -2,8 +2,7 @@ import pandas as pd
 import torch
 from torch.utils.data import TensorDataset, DataLoader
 
-import numpy as np # linear algebra
-import matplotlib.pyplot as plt
+import numpy as np
 
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
@@ -12,11 +11,12 @@ from sklearn.model_selection import train_test_split
 from sklearn.ensemble import GradientBoostingRegressor  # Changed
 from sklearn.metrics import mean_squared_error, mean_absolute_error
 
-from sklearn.ensemble import RandomForestRegressor
+import xgboost as xgb
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, mean_squared_error
 
 from sklearn.metrics import r2_score
+import joblib
 
 #using gpu
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -106,7 +106,6 @@ columnsToUse = ['Seniority', 'Premium', 'Type_risk', 'Area', 'Second_driver', 'Y
 
 data = data[columnsToUse]
 
-# data = data[(data['Type_risk'] == 4)]
 
 
 #We fill the missing length value with the mean so we can use the rest of the row
@@ -119,12 +118,9 @@ data.loc[null_indices, 'Type_fuel'] = 'Unknown'
 # Remove rows with empty values. There aren't many of them so this doesn't affect the data
 # data = data.dropna()
 
-categoricalColumns = ['Type_risk', 'Area', 'Second_driver', 'Distribution_channel', 'Type_fuel', 'Payment']
+categoricalColumns = [ 'Area', 'Second_driver', 'Distribution_channel', 'Type_fuel', 'Payment']
 numericalColumns = ['Seniority', 'Years_on_road','Value_vehicle','Age', 'Years_driving', 'N_claims_history', 'Power', 'Cylinder_capacity', 
 					'Weight', 'Length', 'Contract_year', 'R_Claims_history', 'Years_on_policy', 'accidents', 'Policies_in_force', 'Lapse']
-
-
-
 
 
 preprocessor = ColumnTransformer(
@@ -136,87 +132,106 @@ transformers=[
 
 data.info()
 
-features = data.drop(columns=['Premium'])
-labels = data['Premium']
-
-features_preprocessed = preprocessor.fit_transform(features)
-
-X_train, X_test, y_train, y_test = train_test_split(features_preprocessed, labels, test_size=0.2, random_state=42)
-
-
+# XGBoost parameters
 params = {
-    'objective': 'regression',  # or 'binary' for binary classification
-    'metric': 'rmse',           # or other evaluation metrics
-    'num_leaves': 31,
+    'objective': 'reg:squarederror',  # or 'binary:logistic' for binary classification
+    'eval_metric': 'rmse', 
     'learning_rate': 0.05,
-    'feature_fraction': 0.9,
-    'bagging_fraction': 0.8,
-    'bagging_freq': 5,
-    'verbose': -1,
-    'n_jobs': -1
+    'max_depth': 6,
+    'min_child_weight': 1,
+    'subsample': 0.8,
+    'colsample_bytree': 0.8,
+    'n_estimators': 1000,
+    'seed': 42
 }
 
+# Get unique values of 'Type_risk'
+type_risk_values = data['Type_risk'].unique()
 
-model = RandomForestRegressor(n_estimators=1000, random_state=42)
+# Dictionary to store models
+models = {}
+import matplotlib.pyplot as plt
+
+# Dictionary to store percentage of predictions within different thresholds for each Type_risk value
+percentage_within_thresholds = {type_risk_value: {} for type_risk_value in type_risk_values}
+
+all_absolute_errors = []
+all_actual_values = []
+
+# Iterate over unique 'Type_risk' values
+for type_risk_value in type_risk_values:
+    # Filter data for the current 'Type_risk' value
+    subset_data = data[data['Type_risk'] == type_risk_value]
     
-model.fit(X_train, y_train)
+    # Split the subset data into features and labels
+    subset_features = subset_data.drop(columns=['Premium', 'Type_risk'])
+    subset_labels = subset_data['Premium']
+    
+    # Preprocess features
+    subset_features_preprocessed = preprocessor.fit_transform(subset_features)
 
     
-# Make predictions
-y_pred = model.predict(X_test)
+    # Split data into train and test sets
+    subset_X_train, subset_X_test, subset_y_train, subset_y_test = train_test_split(
+        subset_features_preprocessed, subset_labels, test_size=0.2, random_state=42)
+    
+    # Train the model
+    model = xgb.XGBRegressor(**params)
+    model.fit(subset_X_train, subset_y_train)
+    
+    # Store the model
+    models[type_risk_value] = model
+    
+    # Make predictions
+    y_pred = model.predict(subset_X_test)
+    
+    # Evaluate the model
+    mse = mean_squared_error(subset_y_test, y_pred)
+    print(f"Mean Squared Error for Type_risk {type_risk_value}:", mse)
+    
+    absolute_error = np.abs(subset_y_test - y_pred)
+    average_absolute_error = np.mean(absolute_error)
+    print(f"Average Absolute Error for Type_risk {type_risk_value}:", average_absolute_error)
+    
+    thresholds = {}
+    for threshold in [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]:
+        percentage_within_threshold = np.mean(absolute_error / subset_y_test <= threshold / 100) * 100
+        thresholds[threshold] = percentage_within_threshold
+        print(f"Percentage of predictions within {threshold}% of the actual value for Type_risk {type_risk_value}: {percentage_within_threshold}")
+    
+    # Store the thresholds for this type of risk
+    percentage_within_thresholds[type_risk_value] = thresholds
+    r2 = r2_score(subset_y_test, y_pred)
+    print(f"R² Score for Type_risk {type_risk_value}:", r2)
+    print()
+    
+    all_absolute_errors.extend(absolute_error)
+    all_actual_values.extend(subset_y_test)
 
-# Calculate Mean Squared Error
-mse = mean_squared_error(y_test, y_pred)
-print("Mean Squared Error:", mse)
 
-# Calculate absolute error
-absolute_error = np.abs(y_test - y_pred)
+    
+# Convert lists to numpy arrays for easier calculation
+all_absolute_errors = np.array(all_absolute_errors)
+all_actual_values = np.array(all_actual_values)
 
-average_absolute_error = np.mean(absolute_error)
-print("Average Absolute Error:", average_absolute_error)
-
-# Calculate the percentage of predictions within %
+all_thresholds = {}
 for threshold in [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]:
-        percentage_within_threshold = np.mean(absolute_error / y_test <= threshold / 100) * 100
-        print(f"Percentage of predictions within {threshold}% of the actual value: {percentage_within_threshold}")
-    
+    percentage_within_threshold = np.mean(all_absolute_errors / all_actual_values <= threshold / 100) * 100
+    all_thresholds[threshold] = percentage_within_threshold
+    print(f"Percentage of predictions within {threshold}% of the actual value for the whole dataset: {percentage_within_threshold}")
 
-r2 = r2_score(y_test, y_pred)
-print("R² Score:", r2)
+# Store the thresholds for the whole dataset
+percentage_within_thresholds['All'] = all_thresholds
+# Plotting
+for type_risk_value, thresholds in percentage_within_thresholds.items():
+    plt.plot(thresholds.keys(), thresholds.values(), label=f'Type_risk {type_risk_value}')
 
-encoded_categorical_features = list(preprocessor.named_transformers_['cat'].get_feature_names_out(categoricalColumns))
+plt.xlabel('Threshold (%)')
+plt.ylabel('Percentage of Predictions within Threshold')
+plt.title('Percentage of Predictions within Different Thresholds for Each Type_risk')
+plt.legend()
+plt.grid(True)
+plt.show()
 
-# Combine numerical and encoded categorical feature names
-all_feature_names = numericalColumns + encoded_categorical_features
 
-# Define a function to evaluate model performance for each risk type
-def evaluate_model_by_feature(model, X_test, y_test, risk_types):
-    for risk_type in risk_types:
-        # Filter test data for the current risk type
-        risk_type_indices = X_test[:, all_feature_names.index('Type_risk_' + str(risk_type))] == 1
-        X_test_risk_type = X_test[risk_type_indices]
-        y_test_risk_type = y_test[risk_type_indices]
-
-        # Predict on the filtered test set
-        y_pred_risk_type = model.predict(X_test_risk_type)
-
-        # Calculate metrics for the current risk type
-        mse = mean_squared_error(y_test_risk_type, y_pred_risk_type)
-        mae = mean_absolute_error(y_test_risk_type, y_pred_risk_type)
-        absolute_error_risk_type = np.abs(y_test_risk_type - y_pred_risk_type)
-
-        # Print metrics for the current risk type
-        print(f"Metrics for {risk_type} Risk Type:")
-        print(f"Mean Squared Error: {mse}")
-        print(f"Mean Absolute Error: {mae}")
-        for threshold in [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]:
-            percentage_within_threshold = np.mean(absolute_error_risk_type / y_test_risk_type <= threshold / 100) * 100
-            print(f"Percentage of predictions within {threshold}% of the actual value for Type_risk {risk_type}: {percentage_within_threshold}")
-
-        print(f"Percentage of predictions within {threshold}% of the actual value: {percentage_within_threshold}")
-        print()  # Add an empty line for better readability
-        
-
-risk_types = data['Type_risk'].unique()
-evaluate_model_by_feature(model, X_test, y_test, risk_types)
 
