@@ -110,9 +110,11 @@ data = data[columnsToUse]
 
 
 #We fill the missing length value with the mean so we can use the rest of the row
-# data['Length'].fillna(data['Length'].mean(), inplace=True)
-#We fill the missing fuel type with the most common type
-# data['Type_fuel'].fillna(data['Type_fuel'].mode()[0], inplace=True)
+data['Length'] = data['Length'].fillna(data['Length'].mean())
+
+#Replace the null values of fuel types the a third value
+null_indices = data['Type_fuel'].isnull()
+data.loc[null_indices, 'Type_fuel'] = 'Unknown'
 
 # Remove rows with empty values. There aren't many of them so this doesn't affect the data
 # data = data.dropna()

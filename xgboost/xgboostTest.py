@@ -202,11 +202,6 @@ for type_risk_value in type_risk_values:
     print(f"R² Score for Type_risk {type_risk_value}:", r2)
     print()
     
-    # Print variable importance
-    print("Feature importance for Type_risk", type_risk_value)
-    for feature, importance in zip(subset_features.columns, model.feature_importances_):
-        print(f"{feature}: {importance}")
-
     all_absolute_errors.extend(absolute_error)
     all_actual_values.extend(subset_y_test)
 

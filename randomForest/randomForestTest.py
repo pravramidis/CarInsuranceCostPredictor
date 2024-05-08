@@ -8,22 +8,14 @@ from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.model_selection import train_test_split
 
-from sklearn.ensemble import GradientBoostingRegressor  # Changed
+from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_squared_error, mean_absolute_error
 
-import lightgbm as lgb
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, mean_squared_error
 
-from sklearn.ensemble import RandomForestRegressor
-from sklearn.metrics import r2_score, mean_squared_error, mean_absolute_error
-import numpy as np
-import matplotlib.pyplot as plt
-
-
-from sklearn.ensemble import RandomForestRegressor
-
 from sklearn.metrics import r2_score
+import joblib
 
 #using gpu
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -140,9 +132,15 @@ transformers=[
 data.info()
 
 params = {
-    'n_estimators': 100,
-    'random_state': 42,
-    'n_jobs':-1
+    'objective': 'regression',  # or 'binary' for binary classification
+    'metric': 'rmse',           # or other evaluation metrics
+    'num_leaves': 31,
+    'learning_rate': 0.05,
+    'feature_fraction': 0.9,
+    'bagging_fraction': 0.8,
+    'bagging_freq': 5,
+    'verbose': -1,
+    'n_jobs': -1
 }
 
 # Get unique values of 'Type_risk'
@@ -150,9 +148,13 @@ type_risk_values = data['Type_risk'].unique()
 
 # Dictionary to store models
 models = {}
+import matplotlib.pyplot as plt
 
 # Dictionary to store percentage of predictions within different thresholds for each Type_risk value
 percentage_within_thresholds = {type_risk_value: {} for type_risk_value in type_risk_values}
+
+all_absolute_errors = []
+all_actual_values = []
 
 # Iterate over unique 'Type_risk' values
 for type_risk_value in type_risk_values:
@@ -160,26 +162,31 @@ for type_risk_value in type_risk_values:
     subset_data = data[data['Type_risk'] == type_risk_value]
     
     # Split the subset data into features and labels
-    subset_features = subset_data.drop(columns=['Premium'])
+    subset_features = subset_data.drop(columns=['Premium', 'Type_risk'])
     subset_labels = subset_data['Premium']
-    
     # Preprocess features
     subset_features_preprocessed = preprocessor.fit_transform(subset_features)
-    
+
     # Split data into train and test sets
     subset_X_train, subset_X_test, subset_y_train, subset_y_test = train_test_split(
         subset_features_preprocessed, subset_labels, test_size=0.2, random_state=42)
     
-    # Create and train the RandomForestRegressor model
-    model = RandomForestRegressor(**params)
-    model.fit(subset_X_train, subset_y_train)
+    # Create a LightGBM dataset
     
+    model = RandomForestRegressor(n_estimators=1000, random_state=42)
+    model.fit(subset_X_train, subset_y_train)
+
     # Store the model
     models[type_risk_value] = model
     
     # Make predictions
     y_pred = model.predict(subset_X_test)
+    # Store the model
+    models[type_risk_value] = model
     
+    # Make predictions
+    y_pred = model.predict(subset_X_test)    
+
     # Evaluate the model
     mse = mean_squared_error(subset_y_test, y_pred)
     print(f"Mean Squared Error for Type_risk {type_risk_value}:", mse)
@@ -201,6 +208,20 @@ for type_risk_value in type_risk_values:
     for threshold in [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]:
         percentage_within_threshold = np.mean(absolute_error / subset_y_test <= threshold / 100) * 100
         percentage_within_thresholds[type_risk_value][threshold] = percentage_within_threshold
+
+
+    all_absolute_errors.extend(absolute_error)
+    all_actual_values.extend(subset_y_test)
+
+    
+# Convert lists to numpy arrays for easier calculation
+all_absolute_errors = np.array(all_absolute_errors)
+all_actual_values = np.array(all_actual_values)
+
+# Calculate the percentage within threshold for the whole dataset
+for threshold in [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]:
+    percentage_within_threshold = np.mean(all_absolute_errors / all_actual_values <= threshold / 100) * 100
+    print(f"Percentage of predictions within {threshold}% of the actual value for the whole dataset: {percentage_within_threshold}")
 
 # Plotting
 for type_risk_value, thresholds in percentage_within_thresholds.items():
