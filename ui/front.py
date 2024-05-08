@@ -134,7 +134,12 @@ class VehicleScreen(Screen, DropdownMenuMixin):
         self.add_widget(fl)
 
     def on_dropdown_focus(self, instance, value):
-        if instance == self.ids.type_field:
+        if instance == self.ids.driver:
+            menu_items = [
+            {"text": "Yes", "on_release": lambda x="Yes": self.set_item(x,self.menu, instance)},
+            {"text": "No", "on_release": lambda x="No": self.set_item(x,self.menu, instance)}
+            ]
+        elif instance == self.ids.type_field:
             menu_items = [
             {"text": "Passenger Car", "on_release": lambda x="Passenger Car": self.set_item(x,self.menu, instance)},
             {"text": "Motorbike", "on_release": lambda x="Motorbike": self.set_item(x,self.menu, instance)},
@@ -157,6 +162,9 @@ class VehicleScreen(Screen, DropdownMenuMixin):
     
     def get_registration_year(self):
         return self.ids.registration.text
+    
+    def get_driver(self):
+        return self.ids.driver.text
     
     def get_horse_power(self):
         return self.ids.power.text
@@ -189,12 +197,7 @@ class InsuranceScreen(Screen, DatePickerMixin, DropdownMenuMixin):
             self.show_date_picker(instance,value)
     
     def on_dropdown_focus(self, instance, value):
-        if instance == self.ids.driver:
-            menu_items = [
-            {"text": "Yes", "on_release": lambda x="Yes": self.set_item(x,self.menu, instance)},
-            {"text": "No", "on_release": lambda x="No": self.set_item(x,self.menu, instance)}
-            ]
-        elif instance == self.ids.channel:   
+        if instance == self.ids.channel:   
             menu_items = [
             {"text": "Agent", "on_release": lambda x="Agent": self.set_item(x,self.menu, instance)},
             {"text": "Insurance Brokers", "on_release": lambda x="Insurance Brokers": self.set_item(x,self.menu, instance)}
@@ -215,9 +218,6 @@ class InsuranceScreen(Screen, DatePickerMixin, DropdownMenuMixin):
     
     def get_next_renewal(self):
         return self.ids.next_renewal.text
-    
-    def get_driver(self):
-        return self.ids.driver.text
     
     def get_payment(self):
         return self.ids.payment.text
@@ -288,6 +288,7 @@ class SafeWheels(MDApp):
             "vehicle_type": vehicle_screen.get_vehicle_type(),
             "fuel_type": vehicle_screen.get_fuel_type(),
             "registration_year": vehicle_screen.get_registration_year(),
+            "drivers": vehicle_screen.get_driver(),
             "horse_power": vehicle_screen.get_horse_power(),
             "cylinder_capacity": vehicle_screen.get_cylinder_capacity(),
             "weight": vehicle_screen.get_weight(),
@@ -300,7 +301,6 @@ class SafeWheels(MDApp):
             "start_contract": insurance_screen.get_start_contract(),
             "last_renewal": insurance_screen.get_last_renewal(),
             "next_renewal": insurance_screen.get_next_renewal(),
-            "drivers": insurance_screen.get_driver(),
             "payment": insurance_screen.get_payment(),
             "channel": insurance_screen.get_channel(),            
             "claims": insurance_screen.get_claims(),

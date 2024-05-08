@@ -43,7 +43,7 @@ def makePrediction(input):
         data.at[0,'Type_fuel'] = 'D'
 
 
-    if ( input['insurance_screen']['drivers'] == "Yes"):
+    if ( input['vehicle_screen']['drivers'] == "Yes"):
         data.at[0,'Second_driver'] = 1
     else:
         data.at[0,'Second_driver'] = 0

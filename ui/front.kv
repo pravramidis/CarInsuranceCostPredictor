@@ -325,7 +325,18 @@ ScreenManager:
                             text: "YYYY"
                             mode: "persistent"
 
-                
+                    MDTextField:
+                        id: driver
+                        size_hint_x: None
+                        mode: "outlined"
+                        width: grid.width/3 - dp(20)
+                        on_focus: if self.focus: app.root.get_screen('vehicle').on_dropdown_focus(self, self.focus)
+
+                        MDTextFieldHintText:
+                            text: "Second driver"
+
+                        MDTextFieldTrailingIcon:
+                            icon: "account"
 
                     MDTextField:
                         id: power
@@ -506,19 +517,6 @@ ScreenManager:
                         MDTextFieldHelperText:
                             text: "MM/DD/YYYY"
                             mode: "persistent"
-
-                    MDTextField:
-                        id: driver
-                        size_hint_x: None
-                        mode: "outlined"
-                        width: grid.width/3 - dp(20)
-                        on_focus: if self.focus: app.root.get_screen('insurance').on_dropdown_focus(self, self.focus)
-
-                        MDTextFieldHintText:
-                            text: "Second driver"
-
-                        MDTextFieldTrailingIcon:
-                            icon: "account"
 
                     MDTextField:
                         id: channel
