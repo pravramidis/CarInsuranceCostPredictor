@@ -153,6 +153,9 @@ import matplotlib.pyplot as plt
 # Dictionary to store percentage of predictions within different thresholds for each Type_risk value
 percentage_within_thresholds = {type_risk_value: {} for type_risk_value in type_risk_values}
 
+all_absolute_errors = []
+all_actual_values = []
+
 # Iterate over unique 'Type_risk' values
 for type_risk_value in type_risk_values:
     # Filter data for the current 'Type_risk' value
@@ -211,7 +214,19 @@ for type_risk_value in type_risk_values:
     print("Feature importance for Type_risk", type_risk_value)
     for feature, importance in zip(subset_features.columns, model.feature_importance()):
         print(f"{feature}: {importance}")
+
+    all_absolute_errors.extend(absolute_error)
+    all_actual_values.extend(subset_y_test)
+
     
+# Convert lists to numpy arrays for easier calculation
+all_absolute_errors = np.array(all_absolute_errors)
+all_actual_values = np.array(all_actual_values)
+
+# Calculate the percentage within threshold for the whole dataset
+for threshold in [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]:
+    percentage_within_threshold = np.mean(all_absolute_errors / all_actual_values <= threshold / 100) * 100
+    print(f"Percentage of predictions within {threshold}% of the actual value for the whole dataset: {percentage_within_threshold}")
 
 # Plotting
 for type_risk_value, thresholds in percentage_within_thresholds.items():

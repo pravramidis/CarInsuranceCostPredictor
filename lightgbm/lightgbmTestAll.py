@@ -169,9 +169,11 @@ absolute_error = np.abs(y_test - y_pred)
 average_absolute_error = np.mean(absolute_error)
 print("Average Absolute Error:", average_absolute_error)
 
-# Calculate the percentage of predictions within 10% of the actual value
-percentage_within_set_percent = np.mean(absolute_error / y_test <= 0.1) * 100
-print("Percentage of predictions within 10% of the actual value:", percentage_within_set_percent)
+# Calculate the percentage of predictions within %
+for threshold in [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]:
+        percentage_within_threshold = np.mean(absolute_error / y_test <= threshold / 100) * 100
+        print(f"Percentage of predictions within {threshold}% of the actual value: {percentage_within_threshold}")
+    
 
 r2 = r2_score(y_test, y_pred)
 print("R² Score:", r2)
@@ -197,16 +199,46 @@ def evaluate_model_by_feature(model, X_test, y_test, risk_types):
         mae = mean_absolute_error(y_test_risk_type, y_pred_risk_type)
         absolute_error_risk_type = np.abs(y_test_risk_type - y_pred_risk_type)
 
-        # Calculate the percentage of predictions within 10% of the actual premium
-        percentage_within_10_percent = np.mean(absolute_error_risk_type / y_test_risk_type <= 0.1) * 100
-
         # Print metrics for the current risk type
         print(f"Metrics for {risk_type} Risk Type:")
         print(f"Mean Squared Error: {mse}")
         print(f"Mean Absolute Error: {mae}")
-        print(f"Percentage of predictions within 10% of the actual premium: {percentage_within_10_percent}%")
+        for threshold in [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]:
+            percentage_within_threshold = np.mean(absolute_error_risk_type / y_test_risk_type <= threshold / 100) * 100
+            print(f"Percentage of predictions within {threshold}% of the actual value for Type_risk {risk_type}: {percentage_within_threshold}")
+
+        print(f"Percentage of predictions within {threshold}% of the actual value: {percentage_within_threshold}")
         print()  # Add an empty line for better readability
         
 
 risk_types = data['Type_risk'].unique()
 evaluate_model_by_feature(model, X_test, y_test, risk_types)
+
+# Get feature importances
+feature_importance = model.feature_importance()
+
+# Get the names of the features
+all_feature_names = numericalColumns + encoded_categorical_features
+
+# Create a dictionary with feature names and their corresponding importance values
+feature_importance_dict = dict(zip(all_feature_names, feature_importance))
+
+# Aggregate feature importances for one-hot encoded columns back to original categorical features
+aggregated_feature_importance = {}
+for cat_col in categoricalColumns:
+    related_features = [col for col in all_feature_names if col.startswith(cat_col)]
+    importance_sum = sum(feature_importance_dict[feature] for feature in related_features)
+    aggregated_feature_importance[cat_col] = importance_sum
+
+# Sort aggregated feature importances by importance values
+sorted_aggregated_feature_importance = sorted(aggregated_feature_importance.items(), key=lambda x: x[1], reverse=True)
+
+# Print the aggregated feature importance values for categorical features
+for cat_feature, importance in sorted_aggregated_feature_importance:
+    print(f"Categorical Feature: {cat_feature}, Importance: {importance}")
+
+# Print the feature importance values for numerical features
+sorted_feature_importance = sorted(feature_importance_dict.items(), key=lambda x: x[1], reverse=True)
+for feature, importance in sorted_feature_importance:
+    if feature not in categoricalColumns and not any(feature.startswith(cat_col) for cat_col in categoricalColumns):
+        print(f"Feature: {feature}, Importance: {importance}")
