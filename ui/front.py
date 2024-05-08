@@ -256,6 +256,8 @@ class PriceScreen(Screen):
         licence_issue_date = self.data["main_screen"]["licence_issue_date"]
         area = self.data["main_screen"]["area"]
         prediction = eval.makePrediction(data)
+        premium = self.ids.premium
+        premium.text = str(prediction)[1:-1] + " $"
         print(prediction)
     
 

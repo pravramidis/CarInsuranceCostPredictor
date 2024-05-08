@@ -193,11 +193,14 @@ for type_risk_value in type_risk_values:
     average_absolute_error = np.mean(absolute_error)
     print(f"Average Absolute Error for Type_risk {type_risk_value}:", average_absolute_error)
     
-    # Calculate and print percentage of predictions within different percentage thresholds
+    thresholds = {}
     for threshold in [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]:
         percentage_within_threshold = np.mean(absolute_error / subset_y_test <= threshold / 100) * 100
+        thresholds[threshold] = percentage_within_threshold
         print(f"Percentage of predictions within {threshold}% of the actual value for Type_risk {type_risk_value}: {percentage_within_threshold}")
     
+    # Store the thresholds for this type of risk
+    percentage_within_thresholds[type_risk_value] = thresholds
     r2 = r2_score(subset_y_test, y_pred)
     print(f"R² Score for Type_risk {type_risk_value}:", r2)
     print()
@@ -211,11 +214,14 @@ for type_risk_value in type_risk_values:
 all_absolute_errors = np.array(all_absolute_errors)
 all_actual_values = np.array(all_actual_values)
 
-# Calculate the percentage within threshold for the whole dataset
+all_thresholds = {}
 for threshold in [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]:
     percentage_within_threshold = np.mean(all_absolute_errors / all_actual_values <= threshold / 100) * 100
+    all_thresholds[threshold] = percentage_within_threshold
     print(f"Percentage of predictions within {threshold}% of the actual value for the whole dataset: {percentage_within_threshold}")
 
+# Store the thresholds for the whole dataset
+percentage_within_thresholds['All'] = all_thresholds
 # Plotting
 for type_risk_value, thresholds in percentage_within_thresholds.items():
     plt.plot(thresholds.keys(), thresholds.values(), label=f'Type_risk {type_risk_value}')
