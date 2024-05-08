@@ -21,7 +21,8 @@ ScreenManager:
     
         MDLabel:
             id: welcome_label
-            font_size: '44sp'
+            font_style: "Display"
+            role: "small"
             text: "WELCOME"
             bold: True
             halign: 'center'
@@ -118,6 +119,8 @@ ScreenManager:
                 spacing: 20
 
                 MDLabel:
+                    font_style: "Headline"
+                    role: "small"
                     text: "Please fill in the client's information:"
                     bold: True
                     font_size: '18sp'
@@ -192,10 +195,21 @@ ScreenManager:
                         width: grid.width/2 - dp(20)
                         MDTextFieldHintText:
                             text: "Seniority"
+                Widget:
+                    size_hint_y: None
+                    height: dp(5)
 
+                BoxLayout:
+                    orientation: 'horizontal'
+                    size_hint_y: None
+                    height: dp(50)  # Adjust the height as needed to fit the card
+                    spacing: 40
+                    padding: 40
+                    pos_hint: {'center_x': 0.65, "center_y": 0.5}
                     MDButton:
                         style: "filled"
-                        pos_hint: {"center_x": 0.5}
+                        size_hint_x: None
+                        width: grid.width / 2 - dp(150)
                         on_release:
                             app.root.current = "login"
                             root.manager.transition.direction = "right"
@@ -206,8 +220,8 @@ ScreenManager:
 
                     MDButton:
                         style: "filled"
-                        pos_hint: {"center_x": 0.5}
-                        padding: 20
+                        size_hint_x: None
+                        width: grid.width / 2 - dp(150)
                         on_release:
                             app.root.current = "vehicle"
                             root.manager.transition.direction = "left"
@@ -216,13 +230,11 @@ ScreenManager:
                             text: "NEXT"
                             pos_hint: {"center_x": 0.5, "center_y": 0.5}
                     
-                    Widget:
-                        size_hint_y: None
-                        height: dp(5)
+                Widget:
+                    size_hint_y: None
+                    height: dp(5)
 
-                    Widget:
-                        size_hint_y: None
-                        height: dp(5)
+                
 
 
 <VehicleScreen>
@@ -249,7 +261,10 @@ ScreenManager:
                 padding: 20
                 spacing: 20
 
+
                 MDLabel:
+                    font_style: "Headline"
+                    role: "small"
                     text: "Please fill in the vehicle's information:"
                     bold: True
                     font_size: '18sp'
@@ -364,14 +379,16 @@ ScreenManager:
                             icon: "cash"
                 
                 BoxLayout:
-                    size_hint: 1,None
-                    pos_hint: {'center_x': 0.75, 'center_y': 0.5}
-                    height: dp(48)
-                    spacing: 50  # Add spacing between buttons
-                    padding: [dp(20), 0]
+                    orientation: 'horizontal'
+                    size_hint_y: None
+                    height: dp(50)  # Adjust the height as needed to fit the card
+                    spacing: 40
+                    padding: 40
+                    pos_hint: {'center_x': 0.65, "center_y": 0.5}
                     MDButton:
                         style: "filled"
-                        pos_hint: {"center_x": 0.5}
+                        size_hint_x: None
+                        width: grid.width / 2 - dp(150)
                         on_release:
                             app.root.current = "main"
                             root.manager.transition.direction = "right"
@@ -382,8 +399,8 @@ ScreenManager:
 
                     MDButton:
                         style: "filled"
-                        pos_hint: {"center_x": 0.5}
-                        padding: 20
+                        size_hint_x: None
+                        width: grid.width / 2 - dp(150)
                         on_release:
                             app.root.current = "insurance"
                             root.manager.transition.direction = "left"
@@ -391,6 +408,9 @@ ScreenManager:
                         MDButtonText:
                             text: "NEXT"
                             pos_hint: {"center_x": 0.5, "center_y": 0.5}
+                    
+                
+                
 
                         
 <InsuranceScreen>
@@ -418,13 +438,15 @@ ScreenManager:
                 spacing: 20
 
                 MDLabel:
+                    font_style: "Headline"
+                    role: "small"
                     text: "Please fill in the contract information:"
                     bold: True
                     font_size: '18sp'
                     halign: 'center'
                     size_hint_y: None
-                    size_hint_x: None
-                    width: self.parent.width - dp(50)
+                    size_hint_x: 1
+                    #width: self.parent.width - dp(50)
                     height: card.parent.height -  dp(500)
 
                 MDGridLayout:
@@ -432,8 +454,8 @@ ScreenManager:
                     cols: 3
                     size_hint: 1, None
                     adaptive_height: True
-                    padding: [10, 20]  # padding: [horizontal, vertical]
-                    spacing: [20, 20]  # Increase vertical spacing
+                    padding: [10, 30]  # padding: [horizontal, vertical]
+                    spacing: [20, 30]  # Increase vertical spacing
                 
                     pos_hint: {'center_x': 0.5, "center_y": 0.45}
                 
@@ -571,15 +593,18 @@ ScreenManager:
 
                         MDTextFieldTrailingIcon:
                             icon: "car"
+                
                 BoxLayout:
-                    size_hint: 1,None
-                    pos_hint: {'center_x': 0.75, 'center_y': 0.5}
-                    height: dp(48)
-                    spacing: 50  # Add spacing between buttons
-                    padding: [dp(10), 0]
+                    orientation: 'horizontal'
+                    size_hint_y: None
+                    height: dp(60)  # Adjust the height as needed to fit the card
+                    spacing: 40
+                    padding: 40
+                    pos_hint: {'center_x': 0.65, "center_y": 0.5}
                     MDButton:
                         style: "filled"
-                        pos_hint: {"center_x": 0.5}
+                        size_hint_x: None
+                        width: grid.width / 2 - dp(150)
                         on_release:
                             app.root.current = "vehicle"
                             root.manager.transition.direction = "right"
@@ -590,19 +615,99 @@ ScreenManager:
 
                     MDButton:
                         style: "filled"
-                        pos_hint: {"center_x": 0.5}
-                        padding: 10
+                        size_hint_x: None
+                        width: grid.width / 2 - dp(150)
                         on_release:
                             app.get_all_data()
                             root.manager.transition.direction = "left"
 
                         MDButtonText:
                             text: "CALCULATE"
-                            pos_hint: {"center_x": 0.5, "center_y": 0.5}
+                            pos_hint: {"center_x": 0.5, "center_y": 0.5}                   
+                
+                
+            
 
 <PriceScreen>
     name: "price"
 
+    BoxLayout:
+        orientation: 'vertical'
+        padding: 20
+        spacing: 10
+        size_hint: 1,1
+
+        MDCard:
+            
+            size_hint: 0.9, None
+            padding:20
+            spacing:30
+            pos_hint: {"center_x": 0.5, "center_y": 0.6}
+            height: self.parent.height-dp(150)
+
+
+            BoxLayout:
+                orientation: 'vertical'
+                size_hint_y: None
+                height: self.minimum_height
+                spacing: 20
+
+                MDLabel:
+                    text: "Suggested Premium"
+                    font_style: "Display"
+                    role: "small"  # Adjust the font style as needed for larger text
+                    halign: "center"
+                    size_hint_y: None
+                    height: self.texture_size[1]
+                    padding_y: dp(10)
+
+                MDLabel:
+                    id: premium
+                    text: "$"
+                    font_style: "Display"
+                    role: "small"  # Adjust the font style as needed for larger text
+                    halign: "center"
+                    size_hint_y: None
+                    height: self.texture_size[1]
+                    padding_y: dp(10)
+                Widget:
+                    size_hint_y: None
+                    height: dp(100)
+                BoxLayout:
+                    orientation: 'horizontal'
+                    size_hint_y: None
+                    height: dp(50)  # Adjust the height as needed to fit the card
+                    spacing: 40
+                    padding: 40
+                    pos_hint: {'center_x': 0.65, "center_y": 0.3}
+                    MDButton:
+                        style: "filled"
+                        size_hint_x: None
+                        width: self.parent.width / 2 - dp(150)
+                        on_release:
+                            app.root.current = "vehicle"
+                            root.manager.transition.direction = "right"
+
+                        MDButtonText:
+                            text: "GO BACK"
+                            pos_hint: {"center_x": 0.5, "center_y": 0.5}
+
+                    MDButton:
+                        style: "filled"
+                        size_hint_x: None
+                        width: self.parent.width / 2 - dp(150)
+                        on_release:
+                            app.root.current = "login"
+                            root.manager.transition.direction = "left"
+
+                        MDButtonText:
+                            text: "LOGOUT"
+                            pos_hint: {"center_x": 0.5, "center_y": 0.5}
+                    
+                Widget:
+                    size_hint_y: None
+                    height: dp(5)
+                
 
             
             
