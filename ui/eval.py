@@ -1,6 +1,7 @@
 import lightgbm as lgb
 import pandas as pd
 import joblib
+from datetime import datetime
 
 def makePrediction(input):
 
@@ -13,6 +14,11 @@ def makePrediction(input):
                               'Weight', 'Length', 'Type_fuel', 'Payment', 'Contract_year', 
                               'Policies_in_force', 'Lapse'])
 
+
+
+    #If the user left fields empty then for the numerical values the median will be substitued 
+    #and for the categorical columns the most common value
+
     #changing the format
     if (type_risk_value == "Motorbike"):
         type_risk_value = 1
@@ -23,7 +29,7 @@ def makePrediction(input):
     elif (type_risk_value == "Agricultural Vehicle"):
         type_risk_value = 4
     else: 
-        return
+        type_risk_value = 3
 
     if ( input['main_screen']['area'] == "Urban"):
         data.at[0,'Area'] = 1
@@ -31,10 +37,10 @@ def makePrediction(input):
         data.at[0,'Area'] = 0
 
 
-    if ( input['vehicle_screen']['fuel_type'] == "Diesel"):
-        data.at[0,'Type_fuel'] = 'D'
-    else:
+    if ( input['vehicle_screen']['fuel_type'] == "Petrol"):
         data.at[0,'Type_fuel'] = 'P'
+    else:
+        data.at[0,'Type_fuel'] = 'D'
 
 
     if ( input['insurance_screen']['drivers'] == "Yes"):
@@ -43,16 +49,16 @@ def makePrediction(input):
         data.at[0,'Second_driver'] = 0
 
 
-    if ( input['insurance_screen']['channel'] == "Agent"):
-        data.at[0,'Distribution_channel'] = '0'
-    else:
+    if ( input['insurance_screen']['channel'] == "Insurance Brokers"):
         data.at[0,'Distribution_channel'] = '1'
-
-
-    if ( input['insurance_screen']['payment'] == "Annual"):
-        data.at[0,'Payment'] = 0
     else:
+        data.at[0,'Distribution_channel'] = '0'
+
+
+    if ( input['insurance_screen']['payment'] == "Half-yearly"):
         data.at[0,'Payment'] = 1
+    else:
+        data.at[0,'Payment'] = 0
 
 
 
@@ -71,29 +77,82 @@ def makePrediction(input):
     data.at[0,'Length'] = input['vehicle_screen']['length']
     data.at[0,'Year_matriculation'] = input['vehicle_screen']['registration_year']
     data.at[0,'Policies_in_force'] = input['insurance_screen']['policies']
-    data.at[0,'Seniority'] = input['main_screen']['seniority']
     data.at[0,'Lapse'] = input['insurance_screen']['lapse']
 
-    #Feature engineering
+    if (data.at[0,'Seniority'] == ''):
+        data.at[0,'Seniority'] = 4 
 
+    if (data.at[0,'Weight'] == ''):
+        data.at[0,'Weight'] =  1211 
+
+    if (data.at[0,'Length'] == ''):
+        data.at[0,'Length'] =  4.239000 
+
+    if (data.at[0,'R_Claims_history'] == ''):
+        data.at[0,'R_Claims_history'] = 0    
+
+    if (data.at[0,'Value_vehicle'] == ''):
+        data.at[0,'Value_vehicle'] = 17770 
+
+    if (data.at[0,'N_claims_history'] == ''):
+        data.at[0,'N_claims_history'] = 1
+
+    if (data.at[0,'Power'] == ''):
+        data.at[0,'Power'] = 90
+
+    if (data.at[0,'Cylinder_capacity'] == ''):
+        data.at[0,'Cylinder_capacity'] = 1598
+
+
+
+    if (data.at[0,'Policies_in_force'] == ''):
+        data.at[0,'Policies_in_force'] = 1
+
+    if (data.at[0,'Lapse'] == ''):
+        data.at[0,'Lapse'] = 0
+    
+    if (data.at[0,'Year_matriculation'] == ''):
+        data.at[0,'Year_matriculation'] = 0
+
+    current_date = datetime.now()
+    if (data.at[0,'Date_last_renewal'] == ''):
+        data.at[0,'Date_last_renewal'] = current_date.strftime('%d/%m/%Y')
+        
+
+    if (data.at[0,'Date_next_renewal'] == ''):
+        data.at[0, 'Date_next_renewal'] = (current_date + pd.DateOffset(years=1)).strftime('%d/%m/%Y')
+
+    if (data.at[0,'Date_start_contract'] == ''):
+        data.at[0,'Date_start_contract'] = current_date.strftime('%d/%m/%Y') 
+
+    if (data.at[0,'Date_birth'] == ''):
+        data.at[0,'Date_birth'] = current_date.strftime('%d/%m/%Y')    
+
+    #Feature engineering
     last_renewal_day = pd.to_datetime(data['Date_last_renewal'], format='%d/%m/%Y')
     last_renewal_year = last_renewal_day.dt.year
     data['Last_renewal_year'] = last_renewal_year
-
-    birthday =  pd.to_datetime(data['Date_birth'], format='%d/%m/%Y')
-    birthyear = birthday.dt.year
 
     contract_day = pd.to_datetime(data['Date_start_contract'], format='%d/%m/%Y')
     contract_year = contract_day.dt.year
     data['Contract_year'] = contract_year
 
-    day_start_driving = pd.to_datetime(data['Date_driving_licence'], format='%d/%m/%Y')
-    year_start = day_start_driving.dt.year
+    if (data.at[0,'Date_driving_licence'] == ''):
+       data['Years_driving'] =  24
+    else:
+        day_start_driving = pd.to_datetime(data['Date_driving_licence'], format='%d/%m/%Y')
+        year_start = day_start_driving.dt.year
+        data['Years_driving'] = last_renewal_year - year_start
 
-    data['Years_driving'] = last_renewal_year - year_start
-    data['Age'] = last_renewal_year - birthyear
+    if (data.at[0,'Date_birth'] == ''): 
+       data['Age'] = 47 
+    else: 
+        birthday =  pd.to_datetime(data['Date_birth'], format='%d/%m/%Y')
+        birthyear = birthday.dt.year
+        data['Age'] = last_renewal_year - birthyear
 
     registration_year = data['Year_matriculation'].astype(int)
+    
     data['Years_on_road'] = last_renewal_year - registration_year
 
     next_renewal_day = pd.to_datetime(data['Date_next_renewal'], format='%d/%m/%Y')
