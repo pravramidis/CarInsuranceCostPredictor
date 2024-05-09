@@ -132,14 +132,15 @@ transformers=[
 data.info()
 
 params = {
-    'n_estimators': 1000,
-    'random_state': 42,
-    'max_depth': None,  # Add more parameters as needed
-    'min_samples_split': 2,
-    'min_samples_leaf': 1,
-    'n_jobs': -1
+    'n_estimators': 700,  # More trees can improve performance; you can try other values such as 100, 200, etc.
+    'max_depth': 15,  # Control the maximum depth of each tree to prevent overfitting
+    'min_samples_split': 4,  # Minimum number of samples to split a node
+    'min_samples_leaf': 2,  # Minimum number of samples at a leaf node
+    'max_features': 'sqrt',  # Use sqrt of total features at each split
+    'bootstrap': True,  # Use bootstrapping for sampling
+    'n_jobs': -1,  # Use all available CPU cores
+    'random_state': 42  # Set a seed for reproducibility
 }
-
 # Get unique values of 'Type_risk'
 type_risk_values = data['Type_risk'].unique()
 
@@ -230,51 +231,3 @@ plt.title('Percentage of Predictions within Different Thresholds for Each Type_r
 plt.legend()
 plt.grid(True)
 plt.show()
-
-encoded_categorical_features = list(preprocessor.named_transformers_['cat'].get_feature_names_out(categoricalColumns))
-
-# Combine numerical and encoded categorical feature names
-all_feature_names = numericalColumns + encoded_categorical_features
-
-for type_risk_value, model in models.items():
-    # Get feature importances
-    feature_importance = model.feature_importances_
-
-    # Get the names of the features
-    all_feature_names = numericalColumns + encoded_categorical_features
-
-    # Create a dictionary with feature names and their corresponding importance values
-    feature_importance_dict = dict(zip(all_feature_names, feature_importance))
-
-    # Aggregate feature importances for one-hot encoded columns back to original categorical features
-    aggregated_feature_importance = {}
-    for cat_col in categoricalColumns:
-        related_features = [col for col in all_feature_names if col.startswith(cat_col)]
-        importance_sum = sum(feature_importance_dict[feature] for feature in related_features)
-        # Remove one-hot encoded features from feature_importance_dict
-        for feature in related_features:
-            if feature in feature_importance_dict:
-                del feature_importance_dict[feature]
-        # Store the aggregated importance
-        aggregated_feature_importance[cat_col] = importance_sum
-
-
-
-
-    # Combine individual and aggregated feature importances
-    combined_importances = {**feature_importance_dict, **aggregated_feature_importance}
-
-    # Convert combined importances to DataFrame
-    combined_importance_df = pd.DataFrame({'Feature': list(combined_importances.keys()), 'Importance': list(combined_importances.values())})
-
-    # Sort the DataFrame by importance in descending order
-    combined_importance_df = combined_importance_df.sort_values(by='Importance', ascending=True)
-
-
-    # Plot combined feature importances
-    plt.figure(figsize=(10, 6))
-    plt.barh(combined_importance_df['Feature'], combined_importance_df['Importance'])
-    plt.xlabel('Importance')
-    plt.ylabel('Feature')
-    plt.title(f'Feature Importance for Type_risk {type_risk_value}')
-    plt.show()
