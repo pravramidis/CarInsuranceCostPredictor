@@ -144,6 +144,46 @@
 \end{observation}
 
 \section{User Interface}
-Το user interface της εφαρμογής αναπτύχθηκε με χρήση της Python και ειδικότερα του framework Kivy, καθώς και της συλλογής από γραφικά στοιχεία KivyMD.
+Το user interface της εφαρμογής αναπτύχθηκε με χρήση της Python και ειδικότερα του framework Kivy, καθώς και της συλλογής από γραφικά στοιχεία KivyMD. Στην εφαρμογή μας υπάρχουν πέντε διαφορετικές "οθόνες".
+\begin{enumerate}
+    \item Η οθόνη του login
+    \item Η οθόνη συμπλήρωσης στοιχείων του πελάτη που πρόκειται να ασφαλίσει το όχημά του.
+    \item Η οθόνη συμπλήρωσης στοιχείων του οχήματος που πρόκειται να ασφαλιστεί.
+    \item Η οθόνη συμπλήρωσης στοιχείων παλαιότερων συμβολαίων που είχε ο πελάτης στην εταιρεία.
+    \item Η οθόνη παρουσίασης της προτεινόμενης ετήσιας τιμής χρέωσης του πελάτη με βάση τα στοιχεία που συμπληρώθηκαν.
+\end{enumerate}
+
+\subsection{Login}
+\begin{figure}
+    \begin{center}
+        \includegraphics[width=0.7\textwidth]{images/login.png}
+    \end{center}
+    \caption{Οθόνη login}    
+\end{figure}
+
+
+Πρόκειται για την αρχική οθόνη της εφαρμογής στην οποία ο χρήστης-υπάλληλος της εταιρείας θα πρέπει να συμπληρώσει τα σωστά στοιχεία συνδεσής του (username και password) και στην συνέχεια να πατήσει το κουμπί "LOG IN". Σε περίπτωση που ένα από τα δύο πεδία μείνει κενό, ο χρήστης θα λάβει το αντίστοιχο μήνυμα λάθους [Εικ. \ref{fig:empty}].
+Σε περίπτωση που τα στοιχεία σύνδεσης δεν είναι σωστά, ο χρήστης θα λάβει διαφορετικό μήνυμα λάθους [Εικ. \ref{fig:match}].
+
+Έχει προβλεφθεί και δημιοθργηθεί μόνο ένας λογαριασμός υπαλλήλου. 'Ετσι, για να πάμε στην επόμενη οθόνη θα πρέπει να συμπληρώσουμε στο πεδίο username: \textbf{admin\_1} και στο πεδίο password: \textbf{12345}. Αφού συμπληρώσουμε αυτά τα στοιχεία σωστά και πατήσουμε το κουμπί "LOG IN" μεταφερόμαστε στην δεύτερη οθόνη.
+
+\begin{figure}
+    \centering
+    \begin{subfigure}{0.45\linewidth}
+        \includegraphics[width=\linewidth]{images/login_empty.png}
+        \caption{Κενό πεδίο}
+        \label{fig:empty}
+    \end{subfigure}
+    \begin{subfigure}{0.45\linewidth}
+        \includegraphics[width=\linewidth]{images/login_dont_match.png}
+        \caption{Λάθος στοιχεία}
+        \label{fig:match}
+    \end{subfigure}
+    \caption{Μηνύματα λάθους στο login}
+    \label{fig:errors}
+\end{figure}
+        
+   
+
 \end{document}
 
