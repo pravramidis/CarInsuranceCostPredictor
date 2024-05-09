@@ -17,6 +17,7 @@ from sklearn.metrics import accuracy_score, mean_squared_error
 
 from sklearn.metrics import r2_score
 import joblib
+import os
 
 #using gpu
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -27,6 +28,9 @@ filename = "Motor_vehicle_insurance_data.csv"
 #Reading the csv
 data = pd.read_csv(filename, sep=';')
 
+directory = "xgbModels"
+if not os.path.exists(directory):
+    os.makedirs(directory) 
 
 #ID;Date_start_contract;Date_last_renewal;Date_next_renewal;Date_birth;Date_driving_licence;
 #Distribution_channel;Seniority;Policies_in_force;Max_policies;Max_products;Lapse;Date_lapse;
@@ -170,6 +174,10 @@ for type_risk_value in type_risk_values:
     # Preprocess features
     subset_features_preprocessed = preprocessor.fit_transform(subset_features)
 
+
+
+    # Now you can safely dump your preprocessor object
+    joblib.dump(preprocessor, f"{directory}\\preprocessor_{type_risk_value}.pkl")   
     
     # Split data into train and test sets
     subset_X_train, subset_X_test, subset_y_train, subset_y_test = train_test_split(
@@ -185,6 +193,8 @@ for type_risk_value in type_risk_values:
     # Make predictions
     y_pred = model.predict(subset_X_test)
     
+    model.save_model(f"xgbModels\\model_{type_risk_value}.json")
+
     # Evaluate the model
     mse = mean_squared_error(subset_y_test, y_pred)
     print(f"Mean Squared Error for Type_risk {type_risk_value}:", mse)
@@ -233,5 +243,51 @@ plt.legend()
 plt.grid(True)
 plt.show()
 
+encoded_categorical_features = list(preprocessor.named_transformers_['cat'].get_feature_names_out(categoricalColumns))
 
+# Combine numerical and encoded categorical feature names
+all_feature_names = numericalColumns + encoded_categorical_features
+
+for type_risk_value, model in models.items():
+    # Get feature importances
+    feature_importance = model.feature_importances_
+
+    # Get the names of the features
+    all_feature_names = numericalColumns + encoded_categorical_features
+
+    # Create a dictionary with feature names and their corresponding importance values
+    feature_importance_dict = dict(zip(all_feature_names, feature_importance))
+
+    # Aggregate feature importances for one-hot encoded columns back to original categorical features
+    aggregated_feature_importance = {}
+    for cat_col in categoricalColumns:
+        related_features = [col for col in all_feature_names if col.startswith(cat_col)]
+        importance_sum = sum(feature_importance_dict[feature] for feature in related_features)
+        # Remove one-hot encoded features from feature_importance_dict
+        for feature in related_features:
+            if feature in feature_importance_dict:
+                del feature_importance_dict[feature]
+        # Store the aggregated importance
+        aggregated_feature_importance[cat_col] = importance_sum
+
+
+
+
+    # Combine individual and aggregated feature importances
+    combined_importances = {**feature_importance_dict, **aggregated_feature_importance}
+
+    # Convert combined importances to DataFrame
+    combined_importance_df = pd.DataFrame({'Feature': list(combined_importances.keys()), 'Importance': list(combined_importances.values())})
+
+    # Sort the DataFrame by importance in descending order
+    combined_importance_df = combined_importance_df.sort_values(by='Importance', ascending=True)
+
+
+    # Plot combined feature importances
+    plt.figure(figsize=(10, 6))
+    plt.barh(combined_importance_df['Feature'], combined_importance_df['Importance'])
+    plt.xlabel('Importance')
+    plt.ylabel('Feature')
+    plt.title(f'Feature Importance for Type_risk {type_risk_value}')
+    plt.show()
 

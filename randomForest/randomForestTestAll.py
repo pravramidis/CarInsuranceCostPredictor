@@ -145,19 +145,16 @@ X_train, X_test, y_train, y_test = train_test_split(features_preprocessed, label
 
 
 params = {
-    'objective': 'regression',  # or 'binary' for binary classification
-    'metric': 'rmse',           # or other evaluation metrics
-    'num_leaves': 31,
-    'learning_rate': 0.05,
-    'feature_fraction': 0.9,
-    'bagging_fraction': 0.8,
-    'bagging_freq': 5,
-    'verbose': -1,
+    'n_estimators': 1000,
+    'random_state': 42,
+    'max_depth': None,  # Add more parameters as needed
+    'min_samples_split': 2,
+    'min_samples_leaf': 1,
     'n_jobs': -1
 }
 
 
-model = RandomForestRegressor(n_estimators=1000, random_state=42)
+model = RandomForestRegressor(**params)
     
 model.fit(X_train, y_train)
 
@@ -220,3 +217,44 @@ def evaluate_model_by_feature(model, X_test, y_test, risk_types):
 risk_types = data['Type_risk'].unique()
 evaluate_model_by_feature(model, X_test, y_test, risk_types)
 
+# Get feature importances
+feature_importance = model.feature_importances_
+
+# Get the names of the features
+all_feature_names = numericalColumns + encoded_categorical_features
+
+# Create a dictionary with feature names and their corresponding importance values
+feature_importance_dict = dict(zip(all_feature_names, feature_importance))
+
+# Aggregate feature importances for one-hot encoded columns back to original categorical features
+aggregated_feature_importance = {}
+for cat_col in categoricalColumns:
+    related_features = [col for col in all_feature_names if col.startswith(cat_col)]
+    importance_sum = sum(feature_importance_dict[feature] for feature in related_features)
+    # Remove one-hot encoded features from feature_importance_dict
+    for feature in related_features:
+        if feature in feature_importance_dict:
+            del feature_importance_dict[feature]
+    # Store the aggregated importance
+    aggregated_feature_importance[cat_col] = importance_sum
+
+
+
+
+# Combine individual and aggregated feature importances
+combined_importances = {**feature_importance_dict, **aggregated_feature_importance}
+
+# Convert combined importances to DataFrame
+combined_importance_df = pd.DataFrame({'Feature': list(combined_importances.keys()), 'Importance': list(combined_importances.values())})
+
+# Sort the DataFrame by importance in descending order
+combined_importance_df = combined_importance_df.sort_values(by='Importance', ascending=True)
+
+
+# Plot combined feature importances
+plt.figure(figsize=(10, 6))
+plt.barh(combined_importance_df['Feature'], combined_importance_df['Importance'])
+plt.xlabel('Importance')
+plt.ylabel('Feature')
+plt.title('Variable Importance')
+plt.show()
