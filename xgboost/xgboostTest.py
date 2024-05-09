@@ -193,7 +193,7 @@ for type_risk_value in type_risk_values:
     # Make predictions
     y_pred = model.predict(subset_X_test)
     
-    model.save_model(f"xgbModels\\model_{type_risk_value}.txt")
+    model.save_model(f"xgbModels\\model_{type_risk_value}.json")
 
     # Evaluate the model
     mse = mean_squared_error(subset_y_test, y_pred)

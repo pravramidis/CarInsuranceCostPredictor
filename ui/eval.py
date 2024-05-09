@@ -176,7 +176,7 @@ def makePrediction(input):
 
     print(data)
 
-    loaded_model = xgb.Booster(model_file=f"xgbModels\\model_{type_risk_value}.txt")
+    loaded_model = xgb.Booster(model_file=f"xgbModels\\model_{type_risk_value}.json")
 
     # Load the preprocessor corresponding to your model
     loaded_preprocessor = joblib.load(f"xgbModels\\preprocessor_{type_risk_value}.pkl")
