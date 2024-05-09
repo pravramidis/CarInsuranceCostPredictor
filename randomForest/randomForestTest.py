@@ -132,14 +132,11 @@ transformers=[
 data.info()
 
 params = {
-    'objective': 'regression',  # or 'binary' for binary classification
-    'metric': 'rmse',           # or other evaluation metrics
-    'num_leaves': 31,
-    'learning_rate': 0.05,
-    'feature_fraction': 0.9,
-    'bagging_fraction': 0.8,
-    'bagging_freq': 5,
-    'verbose': -1,
+    'n_estimators': 1000,
+    'random_state': 42,
+    'max_depth': None,  # Add more parameters as needed
+    'min_samples_split': 2,
+    'min_samples_leaf': 1,
     'n_jobs': -1
 }
 
