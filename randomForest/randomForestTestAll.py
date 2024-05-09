@@ -157,7 +157,7 @@ params = {
 }
 
 
-model = RandomForestRegressor(n_estimators=1000, random_state=42)
+model = RandomForestRegressor(**params)
     
 model.fit(X_train, y_train)
 
@@ -220,3 +220,24 @@ def evaluate_model_by_feature(model, X_test, y_test, risk_types):
 risk_types = data['Type_risk'].unique()
 evaluate_model_by_feature(model, X_test, y_test, risk_types)
 
+# Get feature importances
+importances = model.feature_importances_
+
+# Match feature importances with feature names
+feature_importance_dict = dict(zip(all_feature_names, importances))
+
+# Sort feature importances in descending order
+sorted_feature_importances = sorted(feature_importance_dict.items(), key=lambda x: x[1], reverse=True)
+
+# Print feature importances
+print("Feature Importances:")
+for feature, importance in sorted_feature_importances:
+    print(f"{feature}: {importance}")
+
+# Plot feature importances
+plt.figure(figsize=(10, 6))
+plt.barh(range(len(sorted_feature_importances)), [val for _, val in sorted_feature_importances], align='center')
+plt.yticks(range(len(sorted_feature_importances)), [feat for feat, _ in sorted_feature_importances])
+plt.xlabel('Feature Importance')
+plt.title('Variable Importance')
+plt.show()

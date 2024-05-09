@@ -172,8 +172,8 @@ for type_risk_value in type_risk_values:
         subset_features_preprocessed, subset_labels, test_size=0.2, random_state=42)
     
     # Create a LightGBM dataset
-    
-    model = RandomForestRegressor(n_estimators=1000, random_state=42)
+
+    model = RandomForestRegressor(**params)
     model.fit(subset_X_train, subset_y_train)
 
     # Store the model
