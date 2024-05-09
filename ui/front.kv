@@ -74,9 +74,7 @@ ScreenManager:
             style: "filled"
             pos_hint: {"center_x": 0.5}
             width: self.parent.width - dp(200)
-            on_release: 
-                app.root.current = "main"
-                root.manager.transition.direction = "left"
+            on_release: app.root.get_screen('login').user_authentication(self)
 
             MDButtonText:
                 text: "LOG IN"

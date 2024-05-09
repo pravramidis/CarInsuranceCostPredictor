@@ -10,6 +10,11 @@ from kivymd.app import MDApp
 from kivymd.uix.menu import MDDropdownMenu
 from kivymd.uix.pickers import MDDockedDatePicker
 from kivy.metrics import dp
+from kivymd.uix.snackbar import MDSnackbarText
+from kivymd.uix.snackbar import MDSnackbar
+
+
+
 
 import eval
 
@@ -75,6 +80,38 @@ class LoginScreen(Screen):
         bg = Image(source='login_background.png', allow_stretch=True, keep_ratio=False)
         fl.add_widget(bg)
         self.add_widget(fl)
+
+
+    def user_authentication(self, instance):
+        username = self.ids.user.text.strip()
+        password = self.ids.password.text.strip()
+
+        if not username or not password:
+            MDSnackbar(
+                MDSnackbarText(
+                    text="Username or Password cannot be empty",
+                ),
+                y=dp(24),
+                pos_hint={"center_x": 0.5},
+                size_hint_x=0.5,
+            ).open()  
+            return
+        elif username == "admin_1" and password == "12345":
+            self.manager.current = "main"
+            self.manager.transition.direction = "left"
+        else:
+            MDSnackbar(
+                MDSnackbarText(
+                    text="Username and Password do not match",
+                ),
+                y=dp(24),
+                pos_hint={"center_x": 0.5},
+                size_hint_x=0.5,
+            ).open()  
+
+
+
+        
 
 class MainScreen(Screen, DatePickerMixin, DropdownMenuMixin):
     def __init__(self, **kwargs):
