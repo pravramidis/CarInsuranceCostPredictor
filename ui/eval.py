@@ -1,7 +1,7 @@
-import lightgbm as lgb
 import pandas as pd
 import joblib
 from datetime import datetime
+import xgboost as xgb
 
 def makePrediction(input):
 
@@ -176,17 +176,20 @@ def makePrediction(input):
 
     print(data)
 
-    loaded_model = lgb.Booster(model_file=f"lightgbmModels\\model_{type_risk_value}.txt")
+    loaded_model = xgb.Booster(model_file=f"xgbModels\\model_{type_risk_value}.txt")
 
     # Load the preprocessor corresponding to your model
-    loaded_preprocessor = joblib.load(f"lightgbmModels\\preprocessor_{type_risk_value}.pkl")
+    loaded_preprocessor = joblib.load(f"xgbModels\\preprocessor_{type_risk_value}.pkl")
 
 
     # Transform new data using the loaded preprocessor
     new_data_preprocessed = loaded_preprocessor.transform(data)
 
+    new_data_dmatrix = xgb.DMatrix(new_data_preprocessed)
+
     # Make prediction using the loaded model
-    prediction = loaded_model.predict(new_data_preprocessed)
+    prediction = loaded_model.predict(new_data_dmatrix)
+
 
     # Print the prediction
     print("Predicted Premium:", prediction)

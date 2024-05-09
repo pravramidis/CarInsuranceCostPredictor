@@ -17,6 +17,7 @@ from sklearn.metrics import accuracy_score, mean_squared_error
 
 from sklearn.metrics import r2_score
 import joblib
+import os
 
 #using gpu
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -27,6 +28,9 @@ filename = "Motor_vehicle_insurance_data.csv"
 #Reading the csv
 data = pd.read_csv(filename, sep=';')
 
+directory = "xgbModels"
+if not os.path.exists(directory):
+    os.makedirs(directory) 
 
 #ID;Date_start_contract;Date_last_renewal;Date_next_renewal;Date_birth;Date_driving_licence;
 #Distribution_channel;Seniority;Policies_in_force;Max_policies;Max_products;Lapse;Date_lapse;
@@ -170,6 +174,10 @@ for type_risk_value in type_risk_values:
     # Preprocess features
     subset_features_preprocessed = preprocessor.fit_transform(subset_features)
 
+
+
+    # Now you can safely dump your preprocessor object
+    joblib.dump(preprocessor, f"{directory}\\preprocessor_{type_risk_value}.pkl")   
     
     # Split data into train and test sets
     subset_X_train, subset_X_test, subset_y_train, subset_y_test = train_test_split(
@@ -185,6 +193,8 @@ for type_risk_value in type_risk_values:
     # Make predictions
     y_pred = model.predict(subset_X_test)
     
+    model.save_model(f"xgbModels\\model_{type_risk_value}.txt")
+
     # Evaluate the model
     mse = mean_squared_error(subset_y_test, y_pred)
     print(f"Mean Squared Error for Type_risk {type_risk_value}:", mse)
