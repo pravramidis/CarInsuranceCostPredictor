@@ -32,18 +32,6 @@ directory = "xgbModels"
 if not os.path.exists(directory):
     os.makedirs(directory) 
 
-def definition_of_type_risk(number):
-    if number == 1:
-        return "Motorbike"
-    elif number == 2:
-        return "Van"
-    elif number == 3:
-        return "Passenger Car"
-    elif number == 4:
-        return "Agricultural Vehicle"
-    else:
-        return "All"
-
 #ID;Date_start_contract;Date_last_renewal;Date_next_renewal;Date_birth;Date_driving_licence;
 #Distribution_channel;Seniority;Policies_in_force;Max_policies;Max_products;Lapse;Date_lapse;
 #Payment;Premium;Cost_claims_year;N_claims_year;N_claims_history;R_Claims_history;Type_risk;Area;
@@ -153,8 +141,8 @@ params = {
     'objective': 'reg:squarederror',  # or 'binary:logistic' for binary classification
     'eval_metric': 'rmse', 
     'learning_rate': 0.01,
-    'max_depth': 5,
-    'min_child_weight': 1,
+    'max_depth': 6,
+    'min_child_weight': 5,
     'subsample': 0.8,
     'colsample_bytree': 0.8,
     'n_estimators': 1000,
@@ -209,24 +197,22 @@ for type_risk_value in type_risk_values:
 
     # Evaluate the model
     mse = mean_squared_error(subset_y_test, y_pred)
-
-    type_defined = definition_of_type_risk(type_risk_value)
-    print(f"Mean Squared Error for {type_defined}:", mse)
+    print(f"Mean Squared Error for Type_risk {type_risk_value}:", mse)
     
     absolute_error = np.abs(subset_y_test - y_pred)
     average_absolute_error = np.mean(absolute_error)
-    print(f"Average Absolute Error for {type_defined}:", average_absolute_error)
+    print(f"Average Absolute Error for Type_risk {type_risk_value}:", average_absolute_error)
     
     thresholds = {}
     for threshold in [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]:
         percentage_within_threshold = np.mean(absolute_error / subset_y_test <= threshold / 100) * 100
         thresholds[threshold] = percentage_within_threshold
-        print(f"Percentage of predictions within {threshold}% of the actual value for {type_defined}: {percentage_within_threshold}")
+        print(f"Percentage of predictions within {threshold}% of the actual value for Type_risk {type_risk_value}: {percentage_within_threshold}")
     
     # Store the thresholds for this type of risk
     percentage_within_thresholds[type_risk_value] = thresholds
     r2 = r2_score(subset_y_test, y_pred)
-    print(f"R² Score for {type_defined}:", r2)
+    print(f"R² Score for Type_risk {type_risk_value}:", r2)
     print()
     
     all_absolute_errors.extend(absolute_error)
@@ -246,31 +232,15 @@ for threshold in [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]:
 
 # Store the thresholds for the whole dataset
 percentage_within_thresholds['All'] = all_thresholds
-
-# Plotting individual graphs
+# Plotting
 for type_risk_value, thresholds in percentage_within_thresholds.items():
-    type_defined = definition_of_type_risk(type_risk_value)
-    if type_risk_value != 'All':
-        plt.plot(thresholds.keys(), thresholds.values(), label=f'{type_defined}')
+    plt.plot(thresholds.keys(), thresholds.values(), label=f'Type_risk {type_risk_value}')
 
 plt.xlabel('Threshold (%)')
 plt.ylabel('Percentage of Predictions within Threshold')
 plt.title('Percentage of Predictions within Different Thresholds for Each Type_risk')
 plt.legend()
 plt.grid(True)
-plt.savefig('report\\images\\individual_thresholds_xgb.png')
-plt.show()
-
-# Plotting combined graph
-combined_thresholds = percentage_within_thresholds['All']
-
-plt.plot(combined_thresholds.keys(), combined_thresholds.values(), label='All risk types')
-plt.xlabel('Threshold (%)')
-plt.ylabel('Percentage of Predictions within Threshold')
-plt.title('Percentage of Predictions within Different Thresholds for Combined Data')
-plt.legend()
-plt.grid(True)
-plt.savefig('report\\images\\combined_thresholds_xgb.png')
 plt.show()
 
 encoded_categorical_features = list(preprocessor.named_transformers_['cat'].get_feature_names_out(categoricalColumns))
@@ -318,8 +288,6 @@ for type_risk_value, model in models.items():
     plt.barh(combined_importance_df['Feature'], combined_importance_df['Importance'])
     plt.xlabel('Importance')
     plt.ylabel('Feature')
-    type_defined = definition_of_type_risk(type_risk_value) 
-    plt.title(f'Feature Importance for {type_defined}')
-    plt.savefig(f'report\\images\\{type_defined}_feature_importance_xgb.png')
+    plt.title(f'Feature Importance for Type_risk {type_risk_value}')
     plt.show()
 
