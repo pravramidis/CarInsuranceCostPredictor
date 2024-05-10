@@ -478,7 +478,7 @@
     \begin{center}
         \includegraphics[width=0.6\textwidth]{images/combined_trained_all_thresholds_xgb.png}
     \end{center}
-    \caption{Μοντέλο XGBoost που εκπαιδεύθηκε στο σύνολο των δεδομένων}  
+    \caption{Μοντέλο XGBoost που εκπαιδεύτηκε στο σύνολο των δεδομένων}  
     \label{fig:XGBoost_result}  
 \end{figure}
 
@@ -486,7 +486,7 @@
     \begin{center}
         \includegraphics[width=0.6\textwidth]{images/combined_trained_all_thresholds_random_forest.png}
     \end{center}
-    \caption{Μοντέλο Random Forest που εκπαιδεύθηκε στο σύνολο των δεδομένων}  
+    \caption{Μοντέλο Random Forest που εκπαιδεύτηκε στο σύνολο των δεδομένων}  
     \label{fig:random_forest_result}  
 \end{figure}
 
@@ -494,7 +494,7 @@
     \begin{center}
         \includegraphics[width=0.6\textwidth]{images/neural_network_all_thresholds.png}
     \end{center}
-    \caption{Μοντέλο Νευρωνικού δικτύου που εκπαιδεύθηκε στο σύνολο των δεδομένων}  
+    \caption{Μοντέλο Νευρωνικού δικτύου που εκπαιδεύτηκε στο σύνολο των δεδομένων}  
     \label{fig:neural_result}  
 \end{figure}
 
@@ -542,7 +542,7 @@
     \begin{center}
         \includegraphics[width=0.6\textwidth]{images/combined_trained_individual_thresholds_xgb.png}
     \end{center}
-    \caption{Μοντέλο XGBoost που εκπαιδεύθηκε στο σύνολο των δεδομένων ξεχωριστή αξιολόγηση}  
+    \caption{Μοντέλο XGBoost που εκπαιδεύτηκε στο σύνολο των δεδομένων ξεχωριστή αξιολόγηση}  
     \label{fig:XGBoost_result_all_individual}  
 \end{figure}
 
@@ -550,7 +550,7 @@
     \begin{center}
         \includegraphics[width=0.6\textwidth]{images/combined_trained_individual_thresholds_random_forest.png}
     \end{center}
-    \caption{Μοντέλο Random Forest που εκπαιδεύθηκε στο σύνολο των δεδομένων ξεχωριστή αξιολόγηση}  
+    \caption{Μοντέλο Random Forest που εκπαιδεύτηκε στο σύνολο των δεδομένων ξεχωριστή αξιολόγηση}  
     \label{fig:random_forest_result_all_individual}  
 \end{figure}
 
@@ -563,7 +563,7 @@
     \begin{center}
         \includegraphics[width=0.6\textwidth]{images/individual_thresholds_xgb.png}
     \end{center}
-    \caption{Μοντέλο XGBoost που εκπαιδεύθηκε ξεχωριστά για κάθε κατηγορία}  
+    \caption{Μοντέλο XGBoost που εκπαιδεύτηκε ξεχωριστά για κάθε κατηγορία}  
     \label{fig:XGBoost_result_cat}  
 \end{figure}
 
@@ -571,7 +571,7 @@
     \begin{center}
         \includegraphics[width=0.6\textwidth]{images/individual_thresholds_random_forest.png}
     \end{center}
-    \caption{Μοντέλο Random Forest που εκπαιδεύθηκε ξεχωριστά για κάθε κατηγορία}  
+    \caption{Μοντέλο Random Forest που εκπαιδεύτηκε ξεχωριστά για κάθε κατηγορία}  
     \label{fig:random_forest_result_cat}  
 \end{figure}
 
@@ -579,7 +579,7 @@
     \begin{center}
         \includegraphics[width=0.6\textwidth]{images/individual_thresholds_neural.png}
     \end{center}
-    \caption{Μοντέλο Νευρωνικού δικτύου που εκπαιδεύθηκε ξεχωριστά για κάθε κατηγορία}  
+    \caption{Μοντέλο Νευρωνικού δικτύου που εκπαιδεύτηκε ξεχωριστά για κάθε κατηγορία}  
     \label{fig:neural_result_cat}  
 \end{figure}
 
@@ -630,5 +630,82 @@
     \caption{Αξιολόγηση Νευρωνικού δικτύου ανα κατηγορία}
     \label{tab:neural_network_cat_individual}
 \end{table}
+
+Παρατηρούμε ότι το αποτέλεσμα βελτιώθηκε για το το XGBoost και το Random Forest ενώ χειροτέρεψε για το Νευρωνικό δίκτυο.
+Το καλύτερο μοντέλο είναι το XGBoost που εκπαιδεύτηκε ξεχωριστά για κάθε κατηγορία
+για αυτό επιλέξαμε να το χρησιμοποιήσουμε και για την εφαρμογή μας.
+
+Επίσης για το XGBoost και το Random Forest κάναμε ανάλυση της σημαντικότητας 
+των μεταβλητών και για όταν τα μοντέλα εκπαιδεύτηκαν σε όλα τα δεδομένα και όταν είναι χωρισμένα σε κατηγορίες.
+
+\begin{figure}
+    \begin{center}
+        \includegraphics[width=0.6\textwidth]{images/feature_importance_combined_xgb.png}
+    \end{center}
+    \caption{Μοντέλο XGBoost που εκπαιδεύτηκε σε όλα τα δεδομένα}  
+    \label{fig:XGBoost_all_feature_importance}  
+\end{figure}
+
+\begin{figure}
+    \begin{center}
+        \includegraphics[width=0.6\textwidth]{images/feature_importance_combined_random_forest.png}
+    \end{center}
+    \caption{Μοντέλο Random Forest που εκπαιδεύτηκε σε όλα τα δεδομένα}  
+    \label{fig:random_forest_all_feature_importance}  
+\end{figure}
+
+\begin{figure}
+    \centering
+     \begin{subfigure}{0.45\linewidth}
+      \includegraphics[width=\linewidth]{images/Motorbike_feature_importance_xgb.png}
+      \caption{Motorbikes}
+      \label{fig:subxgb1}
+     \end{subfigure}
+     \begin{subfigure}{0.45\linewidth}
+      \includegraphics[width=\linewidth]{images/Van_feature_importance_xgb.png}
+      \caption{Vans}
+      \label{fig:subxgb2}
+      \end{subfigure}
+  \vfill
+       \begin{subfigure}{0.45\linewidth}
+       \includegraphics[width=\linewidth]{images/Passenger Car_feature_importance_xgb.png}
+       \caption{Passenger cars}
+       \label{fig:subxgb3}
+        \end{subfigure}
+         \begin{subfigure}{0.45\linewidth}
+        \includegraphics[width=\linewidth]{images/Agricultural Vehicle_feature_importance_xgb.png}
+        \caption{Agricultural Vehicles}
+        \label{fig:subxgb4}
+         \end{subfigure}
+  \caption{Μοντέλο XGBoost που εκπαιδεύτηκε ξεχωριστά ανα κατηγορία}
+  \label{fig:xgb_split_importance}
+\end{figure}
+
+\begin{figure}
+    \centering
+     \begin{subfigure}{0.45\linewidth}
+      \includegraphics[width=\linewidth]{images/Motorbike_feature_importance_random_forest.png}
+      \caption{Motorbikes}
+      \label{fig:subrandom1}
+     \end{subfigure}
+     \begin{subfigure}{0.45\linewidth}
+      \includegraphics[width=\linewidth]{images/Van_feature_importance_random_forest.png}
+      \caption{Vans}
+      \label{fig:subrandom2}
+      \end{subfigure}
+  \vfill
+       \begin{subfigure}{0.45\linewidth}
+       \includegraphics[width=\linewidth]{images/Van_feature_importance_random_forest.png}
+       \caption{Passenger cars}
+       \label{fig:subrandom3}
+        \end{subfigure}
+         \begin{subfigure}{0.45\linewidth}
+        \includegraphics[width=\linewidth]{images/Agricultural Vehicle_feature_importance_random_forest.png}
+        \caption{Agricultural Vehicles}
+        \label{fig:subrandom4}
+         \end{subfigure}
+  \caption{Μοντέλο XGBoost που εκπαιδεύτηκε ξεχωριστά ανα κατηγορία}
+  \label{fig:RandomForest_split_importance}
+\end{figure}
 
 \end{document}
