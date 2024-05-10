@@ -289,11 +289,6 @@ for risk_type in risk_types:
     # Save trained model
     models[risk_type] = model_risk
 
-# Evaluate each model
-for risk_type, (train_dataset_risk, X_test_risk, y_test_risk) in datasets.items():
-    print(f"Evaluating model for risk type: {risk_type}")
-    evaluate_model(models[risk_type], X_test_risk, y_test_risk, risk_type)
-
 
 # Initialize a list to store risk_type-specific data for plotting
 plots_data = []
