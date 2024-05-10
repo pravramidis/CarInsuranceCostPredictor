@@ -156,12 +156,14 @@ X_train, X_test, y_train, y_test = train_test_split(features_preprocessed, label
 
 
 params = {
-    'n_estimators': 1000,
-    'random_state': 42,
-    'max_depth': None,  # Add more parameters as needed
-    'min_samples_split': 2,
-    'min_samples_leaf': 1,
-    'n_jobs': -1
+    'n_estimators': 700,  # More trees can improve performance; you can try other values such as 100, 200, etc.
+    'max_depth': 15,  # Control the maximum depth of each tree to prevent overfitting
+    'min_samples_split': 4,  # Minimum number of samples to split a node
+    'min_samples_leaf': 2,  # Minimum number of samples at a leaf node
+    'max_features': 'sqrt',  # Use sqrt of total features at each split
+    'bootstrap': True,  # Use bootstrapping for sampling
+    'n_jobs': -1,  # Use all available CPU cores
+    'random_state': 42  # Set a seed for reproducibility
 }
 
 
