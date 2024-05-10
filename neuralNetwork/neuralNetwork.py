@@ -228,6 +228,8 @@ def evaluate_model(model, X_test, y_test, risk_type):
         # Convert y_test to a PyTorch tensor
         y_test_tensor = torch.tensor(y_test.values, dtype=torch.float32, device=device)
 
+
+
         # Calculate Mean Squared Error
         mse = criterion(outputs, y_test_tensor.unsqueeze(1))
         print(f"Mean Squared Error on Test Set: {mse.item()}")
@@ -236,6 +238,10 @@ def evaluate_model(model, X_test, y_test, risk_type):
         mae = mean_absolute_error(y_test, outputs.cpu().numpy())
         print(f"Mean Absolute Error on Test Set: {mae}")
         type_defined = definition_of_type_risk(risk_type)
+
+        r2 = r2_score(y_test,  outputs.cpu().numpy())
+        print(f"R² Score for {type_defined}:", r2)
+        print()
 
         threshold_values = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
         # Calculate percentage within threshold

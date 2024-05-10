@@ -241,6 +241,10 @@ def evaluate_model(model, X_test, y_test):
         mae = mean_absolute_error(y_test, outputs.cpu().numpy())
         print(f"Mean Absolute Error on Test Set: {mae}")
 
+        r2 = r2_score(y_test, outputs.cpu().numpy())
+        print(f"R² Score:", r2)
+        print()
+
         threshold_values = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
         # Calculate percentage within threshold
         percentages_within_threshold = []
