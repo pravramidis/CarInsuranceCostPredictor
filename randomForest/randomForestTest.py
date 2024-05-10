@@ -19,7 +19,17 @@ import joblib
 
 #using gpu
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
+def definition_of_type_risk(number):
+    if number == 1:
+        return "Motorbike"
+    elif number == 2:
+        return "Van"
+    elif number == 3:
+        return "Passenger Car"
+    elif number == 4:
+        return "Agricultural Vehicle"
+    else:
+        return "All"
 
 filename = "Motor_vehicle_insurance_data.csv"
 
@@ -132,7 +142,7 @@ transformers=[
 data.info()
 
 params = {
-    'n_estimators': 700,  # More trees can improve performance; you can try other values such as 100, 200, etc.
+    'n_estimators': 1000,  # More trees can improve performance; you can try other values such as 100, 200, etc.
     'max_depth': 15,  # Control the maximum depth of each tree to prevent overfitting
     'min_samples_split': 4,  # Minimum number of samples to split a node
     'min_samples_leaf': 2,  # Minimum number of samples at a leaf node
@@ -216,14 +226,20 @@ for type_risk_value in type_risk_values:
 all_absolute_errors = np.array(all_absolute_errors)
 all_actual_values = np.array(all_actual_values)
 
-# Calculate the percentage within threshold for the whole dataset
+all_thresholds = {}
 for threshold in [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]:
     percentage_within_threshold = np.mean(all_absolute_errors / all_actual_values <= threshold / 100) * 100
+    all_thresholds[threshold] = percentage_within_threshold
     print(f"Percentage of predictions within {threshold}% of the actual value for the whole dataset: {percentage_within_threshold}")
 
-# Plotting
+# Store the thresholds for the whole dataset
+percentage_within_thresholds['All'] = all_thresholds
+
+# Plotting individual graphs
 for type_risk_value, thresholds in percentage_within_thresholds.items():
-    plt.plot(thresholds.keys(), thresholds.values(), label=f'Type_risk {type_risk_value}')
+    type_defined = definition_of_type_risk(type_risk_value)
+    if type_risk_value != 'All':
+        plt.plot(thresholds.keys(), thresholds.values(), label=f'{type_defined}')
 
 plt.xlabel('Threshold (%)')
 plt.ylabel('Percentage of Predictions within Threshold')
@@ -231,3 +247,63 @@ plt.title('Percentage of Predictions within Different Thresholds for Each Type_r
 plt.legend()
 plt.grid(True)
 plt.show()
+
+# Plotting combined graph
+combined_thresholds = percentage_within_thresholds['All']
+
+plt.plot(combined_thresholds.keys(), combined_thresholds.values(), label='All risk types')
+plt.xlabel('Threshold (%)')
+plt.ylabel('Percentage of Predictions within Threshold')
+plt.title('Percentage of Predictions within Different Thresholds for Combined Data')
+plt.legend()
+plt.grid(True)
+plt.show()
+
+encoded_categorical_features = list(preprocessor.named_transformers_['cat'].get_feature_names_out(categoricalColumns))
+
+# Combine numerical and encoded categorical feature names
+all_feature_names = numericalColumns + encoded_categorical_features
+
+for type_risk_value, model in models.items():
+    # Get feature importances
+    feature_importance = model.feature_importances_
+
+    # Get the names of the features
+    all_feature_names = numericalColumns + encoded_categorical_features
+
+    # Create a dictionary with feature names and their corresponding importance values
+    feature_importance_dict = dict(zip(all_feature_names, feature_importance))
+
+    # Aggregate feature importances for one-hot encoded columns back to original categorical features
+    aggregated_feature_importance = {}
+    for cat_col in categoricalColumns:
+        related_features = [col for col in all_feature_names if col.startswith(cat_col)]
+        importance_sum = sum(feature_importance_dict[feature] for feature in related_features)
+        # Remove one-hot encoded features from feature_importance_dict
+        for feature in related_features:
+            if feature in feature_importance_dict:
+                del feature_importance_dict[feature]
+        # Store the aggregated importance
+        aggregated_feature_importance[cat_col] = importance_sum
+
+
+
+
+    # Combine individual and aggregated feature importances
+    combined_importances = {**feature_importance_dict, **aggregated_feature_importance}
+
+    # Convert combined importances to DataFrame
+    combined_importance_df = pd.DataFrame({'Feature': list(combined_importances.keys()), 'Importance': list(combined_importances.values())})
+
+    # Sort the DataFrame by importance in descending order
+    combined_importance_df = combined_importance_df.sort_values(by='Importance', ascending=True)
+
+
+    # Plot combined feature importances
+    plt.figure(figsize=(10, 6))
+    plt.barh(combined_importance_df['Feature'], combined_importance_df['Importance'])
+    plt.xlabel('Importance')
+    plt.ylabel('Feature')
+    type_defined = definition_of_type_risk(type_risk_value) 
+    plt.title(f'Feature Importance for {type_defined}')
+    plt.show()
