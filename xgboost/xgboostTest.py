@@ -232,15 +232,25 @@ for threshold in [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]:
 
 # Store the thresholds for the whole dataset
 percentage_within_thresholds['All'] = all_thresholds
-# Plotting
-for type_risk_value, thresholds in percentage_within_thresholds.items():
-    plt.plot(thresholds.keys(), thresholds.values(), label=f'Type_risk {type_risk_value}')
 
 plt.xlabel('Threshold (%)')
 plt.ylabel('Percentage of Predictions within Threshold')
 plt.title('Percentage of Predictions within Different Thresholds for Each Type_risk')
 plt.legend()
 plt.grid(True)
+plt.savefig('report\\images\\individual_thresholds_xgb.png')
+plt.show()
+
+# Plotting combined graph
+combined_thresholds = percentage_within_thresholds['All']
+
+plt.plot(combined_thresholds.keys(), combined_thresholds.values(), label='All risk types')
+plt.xlabel('Threshold (%)')
+plt.ylabel('Percentage of Predictions within Threshold')
+plt.title('Percentage of Predictions within Different Thresholds for Combined Data')
+plt.legend()
+plt.grid(True)
+plt.savefig('report\\images\\combined_thresholds_xgbt.png')
 plt.show()
 
 encoded_categorical_features = list(preprocessor.named_transformers_['cat'].get_feature_names_out(categoricalColumns))
