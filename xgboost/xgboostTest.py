@@ -258,6 +258,7 @@ plt.ylabel('Percentage of Predictions within Threshold')
 plt.title('Percentage of Predictions within Different Thresholds for Each Type_risk')
 plt.legend()
 plt.grid(True)
+plt.savefig('report\\images\\individual_thresholds_xgb.png')
 plt.show()
 
 # Plotting combined graph
@@ -269,6 +270,7 @@ plt.ylabel('Percentage of Predictions within Threshold')
 plt.title('Percentage of Predictions within Different Thresholds for Combined Data')
 plt.legend()
 plt.grid(True)
+plt.savefig('report\\images\\combined_thresholds_xgb.png')
 plt.show()
 
 encoded_categorical_features = list(preprocessor.named_transformers_['cat'].get_feature_names_out(categoricalColumns))
@@ -318,5 +320,6 @@ for type_risk_value, model in models.items():
     plt.ylabel('Feature')
     type_defined = definition_of_type_risk(type_risk_value) 
     plt.title(f'Feature Importance for {type_defined}')
+    plt.savefig(f'report\\images\\{type_defined}_feature_importance_xgb.png')
     plt.show()
 

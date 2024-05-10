@@ -254,6 +254,7 @@ plt.ylabel('Percentage of Predictions within Threshold')
 plt.title('Percentage of Predictions within Different Thresholds for Each Type_risk')
 plt.legend()
 plt.grid(True)
+plt.savefig('report\\images\\combined_trained_individual_thresholds_xgb.png')
 plt.show()
 
 # Plotting combined graph
@@ -265,6 +266,7 @@ plt.ylabel('Percentage of Predictions within Threshold')
 plt.title('Percentage of Predictions within Different Thresholds for Combined Data')
 plt.legend()
 plt.grid(True)
+plt.savefig('report\\images\\combined_trained_all_thresholds_xgb.png')
 plt.show()
 
 
@@ -308,4 +310,5 @@ plt.barh(combined_importance_df['Feature'], combined_importance_df['Importance']
 plt.xlabel('Importance')
 plt.ylabel('Feature')
 plt.title('Variable Importance')
+plt.savefig(f'report\\images\\feature_importance_combined_xgb.png')
 plt.show()
