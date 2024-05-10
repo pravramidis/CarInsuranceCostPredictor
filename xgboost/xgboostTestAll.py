@@ -21,6 +21,17 @@ import matplotlib.pyplot as plt
 #using gpu
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+def definition_of_type_risk(number):
+    if number == 1:
+        return "Motorbike"
+    elif number == 2:
+        return "Van"
+    elif number == 3:
+        return "Passenger Car"
+    elif number == 4:
+        return "Agricultural Vehicle"
+    else:
+        return "All"
 
 filename = "Motor_vehicle_insurance_data.csv"
 
@@ -231,11 +242,12 @@ for threshold in [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]:
 # Store the thresholds for the whole dataset
 percentage_within_thresholds_by_risk['All'] = all_thresholds
 
-# Plotting
-for risk_type, thresholds in percentage_within_thresholds_by_risk.items():
-    plt.plot(thresholds.keys(), thresholds.values(), label=f'Type_risk {risk_type}')
 
-
+# Plotting individual graphs
+for type_risk_value, thresholds in percentage_within_thresholds.items():
+    type_defined = definition_of_type_risk(type_risk_value)
+    if type_risk_value != 'All':
+        plt.plot(thresholds.keys(), thresholds.values(), label=f'{type_defined}')
 
 plt.xlabel('Threshold (%)')
 plt.ylabel('Percentage of Predictions within Threshold')
@@ -243,6 +255,18 @@ plt.title('Percentage of Predictions within Different Thresholds for Each Type_r
 plt.legend()
 plt.grid(True)
 plt.show()
+
+# Plotting combined graph
+combined_thresholds = percentage_within_thresholds['All']
+
+plt.plot(combined_thresholds.keys(), combined_thresholds.values(), label='All risk types')
+plt.xlabel('Threshold (%)')
+plt.ylabel('Percentage of Predictions within Threshold')
+plt.title('Percentage of Predictions within Different Thresholds for Combined Data')
+plt.legend()
+plt.grid(True)
+plt.show()
+
 
 # Get feature importances
 feature_importance = model.feature_importances_
