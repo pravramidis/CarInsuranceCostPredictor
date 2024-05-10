@@ -11,6 +11,8 @@
 \usepackage{caption}
 \usepackage{subcaption}
 
+\usepackage{hyperref}
+
 \setsansfont{Arial}
 \setmonofont{Courier New}
 \setmainfont[Mapping=tex-text]{Times New Roman}
@@ -456,10 +458,27 @@
 
 \section{Oπτικοποίηση και αξιολόγηση αποτελεσμάτων}
 
-Για την αξιολόγηση των μοντέλων χρησιμοποιήσαμε το mean squared error, το absolute error και το ποσοστό των προβλέψεων που 
-ήταν εντός της πραγματικής τιμής. Τα αποτελέσματα για κάθε μοντέλο όταν έχει εκπαιδευθεί στο σύνολο των δεδομένων:
+\subsection{Παρουσίαση των αποτελεσμάτων}
 
-\begin{table}[h]
+Για την αξιολόγηση των μοντέλων χρησιμοποιήσαμε το mean squared error, το absolute error και το ποσοστό των προβλέψεων που 
+ήταν εντός ενός ποσοστού της πραγματικής τιμής. Τα αποτελέσματα για κάθε μοντέλο όταν έχει εκπαιδευθεί στο σύνολο των δεδομένων
+φαίνονται στον πίνακα \ref{tab:3x3table} και στα διάγραμματα \ref{fig:XGBoost_result}, 
+\ref{fig:random_forest_result}, \ref{fig:neural_result}. Από αυτήν την αξιολόγηση φαίνεται ότι το πιο ακριβές μοντέλο
+είναι το XGBoost.
+
+Επίσης παρατηρήσαμε ότι υπάρχουν στα δεδομένα μας 4 διαφορετικές κατηγορίες οχήματων και
+για τα μοντέλα του Random Forest και XGBoost που έχουν εκπαιδευθεί στο σύνολο των δεδομένων
+κάναμε ξεχωριστή αξιολόγηση ανα κατηγορία 
+(πίνακες \ref{tab:XGBoost_cat_together}, \ref{tab:RandomForest_cat_together} 
+και διαγράμματα 
+\ref{fig:XGBoost_result_all_individual}, \ref{fig:random_forest_result_all_individual}). Ακόμη κάναμε ανάλυση για την σημασία των μεταβλητών σε αυτά τα μοντέλα 
+(Πίνακες \ref{fig:XGBoost_all_feature_importance}, 
+\ref{fig:random_forest_all_feature_importance}).
+
+
+
+
+\begin{table}
     \centering
     \begin{tabular}{|c|c|c|c|} % 4 columns
         \hline
@@ -498,14 +517,34 @@
     \label{fig:neural_result}  
 \end{figure}
 
+\begin{figure}
+    \begin{center}
+        \includegraphics[width=1\textwidth]{images/feature_importance_combined_xgb.png}
+    \end{center}
+    \caption{Μοντέλο XGBoost που εκπαιδεύτηκε σε όλα τα δεδομένα}  
+    \label{fig:XGBoost_all_feature_importance}  
+\end{figure}
 
-Από αυτής την αξιολόγηση φαίνετε ότι το πιο ακριβές μοντέλο
-είναι το XGBoost.
+\begin{figure}
+    \begin{center}
+        \includegraphics[width=1\textwidth]{images/feature_importance_combined_random_forest.png}
+    \end{center}
+    \caption{Μοντέλο Random Forest που εκπαιδεύτηκε σε όλα τα δεδομένα}  
+    \label{fig:random_forest_all_feature_importance}  
+\end{figure}
 
-Παρατηρήσαμε ότι υπάρχουν στα δεδομένα μας 4 διαφορετικές κατηγορίες οχήματων και
-για τα μοντέλα του Random Forest και XGBoost που έχουν εκπαιδευθεί στον σύνολο τον δεδομένων
-κάναμε ξεχωριστή αξιολόγηση ανα κατηγορία.
-\begin{table}[h]
+Παρατηρήσαμε ότι το Type risk παίζει πολύ σημαντικό ρόλο για το XGBoost και σημαντικό ρόλο στο
+Random Forest καθώς και ότι υπήρχε πολύ χαμηλή ακρίβεια στις μικρότερες κατηγορίες οπότε
+αποφασίσαμε να δοκιμάσουμε να εκπαιδεύσουμε διαφορετικό μοντέλο για κάθε κατηγορία. Αυτό βελτίωσε αρκετά την ακρίβεια 
+του XGBoost [πίνακας \ref{tab:XGBoost_cat_individual}, διάγραμμα \ref{fig:XGBoost_result_all_individual}], 
+λίγο την ακρίβεια του random forest [πίνακας \ref{tab:RandomForest_cat_individual}, διάγραμμα \ref{fig:random_forest_result_all_individual}] 
+ενώ η ακρίβεια του νευρωνικού μειώθηκε [πίνακας \ref{tab:neural_network_cat_individual}, διάγραμμα \ref{fig:neural_result_cat}].
+
+Πραγματοποιήσαμε και μελέτη της σημαντικότητας των features 
+στο XGBoost [διάγραμμα \ref{fig:xgb_split_importance}] και 
+το Random Forest [διαγράμμα \ref{fig:RandomForest_split_importance}]
+
+\begin{table}
     \centering
     \begin{tabular}{|c|c|c|c|} % 4 columns
         \hline
@@ -521,7 +560,7 @@
     \label{tab:XGBoost_cat_together}
 \end{table}
 
-\begin{table}[h]
+\begin{table}
     \centering
     \begin{tabular}{|c|c|c|c|} % 4 columns
         \hline
@@ -554,11 +593,6 @@
     \label{fig:random_forest_result_all_individual}  
 \end{figure}
 
-
-Όπως εξηγήσαμε και στην εκπαίδευση των μοντέλων αποφασήσαμε να μοιράσουμε τα 
-δεδομένα στις τέσσερις κατηγορίες και να εκπεδαίυσουμε ένα μοντέλο για την καθεμία
-και όντως η ακρίβεια των μοντέλων αυξήθηκε 
-
 \begin{figure}
     \begin{center}
         \includegraphics[width=0.6\textwidth]{images/individual_thresholds_xgb.png}
@@ -583,7 +617,7 @@
     \label{fig:neural_result_cat}  
 \end{figure}
 
-\begin{table}[h]
+\begin{table}
     \centering
     \begin{tabular}{|c|c|c|c|} % 4 columns
         \hline
@@ -599,7 +633,7 @@
     \label{tab:XGBoost_cat_individual}
 \end{table}
 
-\begin{table}[h]
+\begin{table}
     \centering
     \begin{tabular}{|c|c|c|c|} % 4 columns
         \hline
@@ -615,7 +649,7 @@
     \label{tab:RandomForest_cat_individual}
 \end{table}
 
-\begin{table}[h]
+\begin{table}
     \centering
     \begin{tabular}{|c|c|c|c|} % 4 columns
         \hline
@@ -631,50 +665,27 @@
     \label{tab:neural_network_cat_individual}
 \end{table}
 
-Παρατηρούμε ότι το αποτέλεσμα βελτιώθηκε για το το XGBoost και το Random Forest ενώ χειροτέρεψε για το Νευρωνικό δίκτυο.
-Το καλύτερο μοντέλο είναι το XGBoost που εκπαιδεύτηκε ξεχωριστά για κάθε κατηγορία
-για αυτό επιλέξαμε να το χρησιμοποιήσουμε και για την εφαρμογή μας.
-
-Επίσης για το XGBoost και το Random Forest κάναμε ανάλυση της σημαντικότητας 
-των μεταβλητών και για όταν τα μοντέλα εκπαιδεύτηκαν σε όλα τα δεδομένα και όταν είναι χωρισμένα σε κατηγορίες.
-
-\begin{figure}
-    \begin{center}
-        \includegraphics[width=0.6\textwidth]{images/feature_importance_combined_xgb.png}
-    \end{center}
-    \caption{Μοντέλο XGBoost που εκπαιδεύτηκε σε όλα τα δεδομένα}  
-    \label{fig:XGBoost_all_feature_importance}  
-\end{figure}
-
-\begin{figure}
-    \begin{center}
-        \includegraphics[width=0.6\textwidth]{images/feature_importance_combined_random_forest.png}
-    \end{center}
-    \caption{Μοντέλο Random Forest που εκπαιδεύτηκε σε όλα τα δεδομένα}  
-    \label{fig:random_forest_all_feature_importance}  
-\end{figure}
-
 \begin{figure}
     \centering
      \begin{subfigure}{0.45\linewidth}
       \includegraphics[width=\linewidth]{images/Motorbike_feature_importance_xgb.png}
-      \caption{Motorbikes}
+      \caption{Μοτοσυκλέτα}
       \label{fig:subxgb1}
      \end{subfigure}
      \begin{subfigure}{0.45\linewidth}
       \includegraphics[width=\linewidth]{images/Van_feature_importance_xgb.png}
-      \caption{Vans}
+      \caption{Βανάκι}
       \label{fig:subxgb2}
       \end{subfigure}
   \vfill
        \begin{subfigure}{0.45\linewidth}
        \includegraphics[width=\linewidth]{images/Passenger Car_feature_importance_xgb.png}
-       \caption{Passenger cars}
+       \caption{Επιβατικό Αυτοκίνητο}
        \label{fig:subxgb3}
         \end{subfigure}
          \begin{subfigure}{0.45\linewidth}
         \includegraphics[width=\linewidth]{images/Agricultural Vehicle_feature_importance_xgb.png}
-        \caption{Agricultural Vehicles}
+        \caption{Αγροτικό Όχημα}
         \label{fig:subxgb4}
          \end{subfigure}
   \caption{Μοντέλο XGBoost που εκπαιδεύτηκε ξεχωριστά ανα κατηγορία}
@@ -685,27 +696,61 @@
     \centering
      \begin{subfigure}{0.45\linewidth}
       \includegraphics[width=\linewidth]{images/Motorbike_feature_importance_random_forest.png}
-      \caption{Motorbikes}
+      \caption{Μοτοσυκλέτα}
       \label{fig:subrandom1}
      \end{subfigure}
      \begin{subfigure}{0.45\linewidth}
       \includegraphics[width=\linewidth]{images/Van_feature_importance_random_forest.png}
-      \caption{Vans}
+      \caption{Βανάκι}
       \label{fig:subrandom2}
       \end{subfigure}
   \vfill
        \begin{subfigure}{0.45\linewidth}
-       \includegraphics[width=\linewidth]{images/Van_feature_importance_random_forest.png}
-       \caption{Passenger cars}
+       \includegraphics[width=\linewidth]{images/Passenger Car_feature_importance_random_forest.png}
+       \caption{Επιβατικό Αυτοκίνητο}
        \label{fig:subrandom3}
         \end{subfigure}
          \begin{subfigure}{0.45\linewidth}
         \includegraphics[width=\linewidth]{images/Agricultural Vehicle_feature_importance_random_forest.png}
-        \caption{Agricultural Vehicles}
+        \caption{Αγροτικό Όχημα}
         \label{fig:subrandom4}
          \end{subfigure}
-  \caption{Μοντέλο XGBoost που εκπαιδεύτηκε ξεχωριστά ανα κατηγορία}
+  \caption{Μοντέλο Random Forest που εκπαιδεύτηκε ξεχωριστά ανα κατηγορία}
   \label{fig:RandomForest_split_importance}
 \end{figure}
+
+Απο την παραπάνω ανάλυση προκύπτει ότι το καλύτερο μας μοντέλο είναι το XGBoost 
+όταν εκπαιδευθεί ξεχωριστά για κάθε κατηγορία οχήματος. Η ακρίβεια του είναι 
+34.68 \% των προβλέψεων είναι εντός 10 \% της πραγματικής τιμής. 
+[διαγράμμα \ref{fig:XGBoost_best_result_combined}]
+
+\begin{figure}
+    \begin{center}
+        \includegraphics[width=0.6\textwidth]{images/combined_thresholds_xgb.png}
+    \end{center}
+    \caption{Μοντέλο Νευρωνικού δικτύου που εκπαιδεύτηκε ξεχωριστά για κάθε κατηγορία συγκεντρωμένα αποτελέσματα}  
+    \label{fig:XGBoost_best_result_combined}  
+\end{figure}
+
+\subsection{Σχολιασμός των αποτελεσμάτων}
+
+Παρατήρούμε ότι ακόμα και το καλύτερο 
+μοντέλο μας δεν πετυχαίνει την απολύτη ακρίβεια αν και όπως φαίνεται
+στο διάγραμμα σχεδόν το 90 \% των προβλέψεων είναι εντός του 40 \% της πραγματικής τιμής
+ενώ λιγότερες απο 3 \% των προβλέψεων έχουν ξεφύγει πάνω απο 80 \% της πραγματικής τιμής.
+Αυτή η αποκλήση μπορεί να οφείλετε σε έλειψη πληροφορίας απο το δεδομένα μας αφού ενδέχετε 
+η ασφαλιστική εταιρεία να μην δημοσίευσε όλες της παραμέτρους που χρησιμοποιεί για να 
+χρεώσει τους πελάτες της(π.χ αν έκανε επιπλέον εκπτώσεις για να κερδίσει μερίδιο στην αγορά)
+
+Σχετικά με την σημαντικότητα των χαρακτηριστικών είναι λογικό που ο τρόπος πληρωμής 
+είναι το πιο σημαντικό χαρακτηριστικό στις 3 απο τις 4 κατηγορίες αφού αν πλήρωνεις
+για όλο τον χρόνο η τιμή είναι λίγο μικρότερη. Για της μοτοσυκλέτες είναι λογικό 
+τα πιο σημαντικά χαρακτηριστικά να είναι ο κύβισμος και η ηλικία του οδηγού αφού
+οι νέοι οδηγοί και η μηχανές με υψηλό κυβισμό προκαλούν πιο πολλά ατυχήματα.
+Για τα βανάκια είναι λογικό ότι πιο σημαντικός παράγωντας είναι η αξία τους και η περιοχή 
+τους γιατί υπάρχει ((δεν ξέρω)). Για τα επιβατικά αυτοκίνητα σηματνικότεροι παράγωντες είναι
+η ηλικία του αυτοκινήτου, η αξία του και απο πού αγόρασε την ασφάλεια. Για τα αγροτικά οχήματα
+το πιο σημάντικό είναι η ηλικία του οχήματος και πόσα χρόνια είναι κάποις ασφαίσμένος
+
 
 \end{document}
