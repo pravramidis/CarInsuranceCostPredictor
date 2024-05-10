@@ -379,5 +379,35 @@
 
 \subsection{Γενικές παρατηρήσεις για το ui}
 //κενά πεδία
+
+
+\section{Oπτικοποίηση και αξιολόγηση αποτελεσμάτων}
+
+Όπως φαίνετε απο τα παρακάτω διαγράμματα, από τα μοντέλα που χρησιμοποιήσαμε 
+τα καλύτερα αποτελέσματα μας έδωσε το XGBoost.
+
+\begin{figure}
+    \begin{center}
+        \includegraphics[width=0.6\textwidth]{images/combined_thresholds_xgb.png}
+    \end{center}
+    \caption{Μοντέλο XGBoost που εκπαιδεύθηκε στο σύνολο των δεδομένων}  
+    \label{fig:XGBoost_result}  
+\end{figure}
+
+\begin{figure}
+    \begin{center}
+        \includegraphics[width=0.6\textwidth]{images/combined_trained_all_thresholds_random_forest.png}
+    \end{center}
+    \caption{Μοντέλο Random Forest που εκπαιδεύθηκε στο σύνολο των δεδομένων}  
+    \label{fig:random_forest_result}  
+\end{figure}
+
+\begin{figure}
+    \begin{center}
+        \includegraphics[width=0.6\textwidth]{images/neural_network_all_thresholds.png}
+    \end{center}
+    \caption{Μοντέλο Νευρωνικού δικτύου που εκπαιδεύθηκε στο σύνολο των δεδομένων}  
+    \label{fig:neural_result}  
+\end{figure}
 \end{document}
 
