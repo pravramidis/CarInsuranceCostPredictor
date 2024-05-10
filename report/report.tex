@@ -225,6 +225,159 @@
 \end{observation}
 
 \section{User Interface}
-Το user interface της εφαρμογής αναπτύχθηκε με χρήση της Python και ειδικότερα του framework Kivy, καθώς και της συλλογής από γραφικά στοιχεία KivyMD.
+Το user interface της εφαρμογής αναπτύχθηκε με χρήση της Python και ειδικότερα του framework Kivy, καθώς και της συλλογής από γραφικά στοιχεία KivyMD. Στην εφαρμογή μας υπάρχουν πέντε διαφορετικές "οθόνες":
+\begin{enumerate}
+    \item Η οθόνη του login
+    \item Η οθόνη συμπλήρωσης στοιχείων του πελάτη που πρόκειται να ασφαλίσει το όχημά του.
+    \item Η οθόνη συμπλήρωσης στοιχείων του οχήματος που πρόκειται να ασφαλιστεί.
+    \item Η οθόνη συμπλήρωσης στοιχείων παλαιότερων συμβολαίων που είχε ο πελάτης στην εταιρεία.
+    \item Η οθόνη παρουσίασης της προτεινόμενης ετήσιας τιμής χρέωσης του πελάτη με βάση τα στοιχεία που συμπληρώθηκαν.
+\end{enumerate}
+
+\subsection{Login}
+Η οθόνη του login είναι η αρχική οθόνη της εφαρμογής [Εικ. \ref{fig:login}] στην οποία ο χρήστης - υπάλληλος της εταιρείας θα πρέπει να συμπληρώσει τα σωστά στοιχεία συνδεσής του (username και password) και στην συνέχεια να πατήσει το κουμπί "LOG IN". Σε περίπτωση που ένα από τα δύο πεδία μείνει κενό, ο χρήστης θα λάβει το αντίστοιχο μήνυμα λάθους [Εικ. \ref{fig:empty}].
+Σε περίπτωση που τα στοιχεία σύνδεσης δεν είναι σωστά, ο χρήστης θα λάβει διαφορετικό μήνυμα λάθους [Εικ. \ref{fig:match}].
+
+Έχει προβλεφθεί και δημιοθργηθεί μόνο ένας λογαριασμός υπαλλήλου. 'Ετσι, για να πάμε στην επόμενη οθόνη θα πρέπει να συμπληρώσουμε στο πεδίο username: \textbf{admin\_1} και στο πεδίο password: \textbf{12345}. Αφού συμπληρώσουμε αυτά τα στοιχεία σωστά και πατήσουμε το κουμπί "LOG IN" μεταφερόμαστε στην δεύτερη οθόνη [Εικ. \ref{fig:driver}].
+\begin{figure}
+    \begin{center}
+        \includegraphics[width=0.6\textwidth]{images/login.png}
+    \end{center}
+    \caption{Οθόνη login} 
+    \label{fig:login}   
+\end{figure}
+
+\begin{figure}
+    \centering
+    \begin{subfigure}{0.45\linewidth}
+        \includegraphics[width=\linewidth]{images/login_empty.png}
+        \caption{Κενό πεδίο}
+        \label{fig:empty}
+    \end{subfigure}
+    \begin{subfigure}{0.45\linewidth}
+        \includegraphics[width=\linewidth]{images/login_dont_match.png}
+        \caption{Λάθος στοιχεία}
+        \label{fig:match}
+    \end{subfigure}
+    \caption{Μηνύματα λάθους στο login}
+    \label{fig:errors}
+\end{figure}
+        
+\subsection{Στοιχεία πελάτη}
+Στην οθόνη συμπλήρωσης στοιχείων του πελάτη [Εικ. \ref{fig:driver}], ο χρήστης-υπάλληλος της εταιρείας θα πρέπει να συμπληρώσει τα στοιχεία του ανθρώπου που ενδιαφέρεται 
+να ασφαλίσει το όχημά του. Ειδικότερα, υπάρχουν δύο πεδία επιλογής ημερομηνίας ("Date of Birth", "License Issue Date"), τα οποία όταν επιλεχθούν εμφανίζεται 
+ένα ημερολόγιο [Εικ. \ref{fig:date}] προκειμένου να επιλεχθεί η κατάλληλη ημερομηνία. Πατώντας το πεδίο "Area" ο χρήστης βλέπει ένα μενού δύο επιλογών [Εικ. \ref{fig:area}] από τις οποίες θα πρέπει να επιλέξει μία.
+Στο πεδίο "Seniority" ο χρήστης θα πρέπει να πληκτρολογήσει έναν αριθμό που προσδιορίζει τα χρόνια που ο συγεκριμένος πελάτης είναι ασφαλισμένος στην εταιρεία. 
+
+Αφού συμπληρωθούν όλα τα πεδία ο χρήστης θα πρέπει να πατήσει το 
+κουμπί "NEXT" για να μεταφερθεί στην επόμενη οθόνη [Εικ. \ref{fig:vehicle}]. Σε περίπτωση που επιθυμεί να πάει στην οθόνη του login [Εικ. \ref{fig:login}] θα πρέπει να πατήσει το κουμπί "GO BACK".
+
+\begin{figure}
+    \begin{center}
+        \includegraphics[width=0.6\textwidth]{images/driver.png}
+    \end{center}
+    \caption{Οθόνη συμπλήρωσης στοιχείων πελάτη}  
+    \label{fig:driver}  
+\end{figure}
+
+\begin{figure}
+    \centering
+    \begin{subfigure}{0.45\linewidth}
+        \includegraphics[width=\linewidth]{images/driver_datepicker.png}
+        \caption{Ημερολόγιο}
+        \label{fig:date}
+    \end{subfigure}
+    \begin{subfigure}{0.45\linewidth}
+        \includegraphics[width=\linewidth]{images/driver_area.png}
+        \caption{Μενού επιλογών}
+        \label{fig:area}
+    \end{subfigure}
+    \caption{Παραδείγματα εισόδου}
+    \label{fig:driver_examples}
+\end{figure}
+
+
+\subsection{Στοιχεία οχήματος}
+Σε αυτήν την οθόνη [Εικ. \ref{fig:vehicle}], ο χρήστης-υπάλληλος της εταιρείας θα πρέπει να συμπληρώσει τα στοιχεία του οχήματος το οποίο επιθυμεί να ασφαλίσει ο πελάτης. Ειδικότερα, για τα πεδία 
+"Type of vehicle", "Type of fuel", "Second driver" ο χρήστης θα πρέπει να πατήσει καθένα από αυτά τα πεδία και να επιλέξει μία από τις επιλογές που εμφανίζονται στο κάθε μενού επιλογών (ενδεικτικά [Εικ. \ref{fig:type}]). 
+Στα υπόλοιπα πεδία ο χρήστης θα πρέπει να πληκτρολογήσει έναν αριθμό σύμφωνα με τις υποδείξεις του κάθε πεδίου (ενδεικτικά [Εικ. \ref{fig:reg}]).
+
+Για να μεταβεί στην επόμενη οθόνη [Εικ. \ref{fig:contract}] θα πρέπει να πατήσει το κουμπί "NEXT" ενώ για να πάει στην προηγούμενη οθόνη [Εικ. \ref{fig:driver}] συμπλήρωσης των στοιχείων του πελάτη θα πρέπει να πατήσει το κουμπί "GO BACK".
+
+\begin{figure}
+    \begin{center}
+        \includegraphics[width=0.6\textwidth]{images/vehicle.png}
+    \end{center}
+    \caption{Οθόνη συμπλήρωσης στοιχείων οχήματος προς ασφάλιση}  
+    \label{fig:vehicle}  
+\end{figure}
+
+\begin{figure}
+    \centering
+    \begin{subfigure}{0.45\linewidth}
+        \includegraphics[width=\linewidth]{images/vehicle_type.png}
+        \caption{Παράδειγμα μενού επιλογών}
+        \label{fig:type}
+    \end{subfigure}
+    \begin{subfigure}{0.45\linewidth}
+        \includegraphics[width=\linewidth]{images/vehicle_reg_year.png}
+        \caption{Παράδειγμα συμπλήρωσης πεδίου}
+        \label{fig:reg}
+    \end{subfigure}
+    \caption{Παραδείγματα εισόδου}
+    \label{fig:vehicle_examples}
+\end{figure}
+
+\newpage
+\subsection{Στοιχεία συμβολαίου}
+Στην οθόνη συμπληρωσης στοιχείων συμβολαίου [Εικ. \ref{fig:contract}] ο χρήστης-υπάλληλος της εταιρείας θα πρέπει να συμπληρώσει στοιχεία που αφορούν παλαιότερα συμβόλαια που είχε ο πελάτης στην εταιρεία.
+Υπάρχουν τρία πεδία επιλογής ημερομηνίας ("Start Contract", "Last renewal", "Next renewal"), τα οποία όταν επιλεχθούν εμφανίζεται ημερολόγιο (ενδεικτικά [Εικ. \ref{fig:con_date}]). Τα πεδία "Distribution Channel" και "Payment" είναι πεδία που
+κατά την επιλογή τους εμφανίζεται μενού επιλογών (ενδεικτικά [Εικ. \ref{fig:pay}]), ενώ τα υπόλοιπα πρέπει να συμπληρωθούν με πληκτρολόγηση σύμφωνα με τις υποδείξεις των πεδίων.
+
+Για την μετάβαση στην προηγούμενη οθόνη [Εικ. \ref{fig:vehicle}] ο χρήστης θα πρέπει να πατήσει το κουμπί "GO BACK". Διαφορετικά, βρισκόμαστε στο σημείο που έχουν συμπληρωθεί όλα τα στοιχεία και ο χρήστης θα πρέπει να πατήσει το 
+κουμπί "CALCULATE" προκειμένου να μεταβεί στην τελευταία οθόνη [Εικ. \ref{fig:premium}].
+
+\begin{figure}
+    \begin{center}
+        \includegraphics[width=0.6\textwidth]{images/contract.png}
+    \end{center}
+    \caption{Οθόνη συμπλήρωσης στοιχείων οχήματος προς ασφάλιση}  
+    \label{fig:contract}  
+\end{figure}
+
+\begin{figure}
+    \centering
+    \begin{subfigure}{0.45\linewidth}
+        \includegraphics[width=\linewidth]{images/contract_date.png}
+        \caption{Παράδειγμα ημερολογίου}
+        \label{fig:con_date}
+    \end{subfigure}
+    \begin{subfigure}{0.45\linewidth}
+        \includegraphics[width=\linewidth]{images/contract_pay.png}
+        \caption{Παράδειγμα μενού επιλογών}
+        \label{fig:pay}
+    \end{subfigure}
+    \caption{Παραδείγματα εισόδου}
+    \label{fig:contract_examples}
+\end{figure}
+
+\newpage
+\subsection {Οθόνη προτινόμενης χρέωσης}
+Σε αυτήν την οθόνη [Εικ. \ref{fig:premium}], ο χρήστης-υπάλληλος της εταιρείας βλέπει την προτεινόμενη τιμή ασφάλισης του οχήματος που πρόκειται να ασφαλίσει ο πελάτης.
+Πατώντας το κουμπί "GO BACK" μπορεί να μεταβεί στην προήγουμενη οθόνη [Εικ. \ref{fig:contract}], ενώ πατώντας το κουμπί "LOGOUT" μεταβαίνει στην αρχική οθόνη της εφαρμογής [Εικ. \ref{fig:login}].
+
+Αξίζει να σημειωθεί πως ο χρήστης μπορεί να πηγαίνει προς τα πίσω και να αλλάζει στοιχεία ανά πάσα στιγμή. Κάθε φορά που πατά το κουμπί "CALCULATE" της προτελευταίας οθόνης [Εικ. \ref{fig:contract}], 
+όλα τα ανανεωμένα στοιχεία δίνονται στο μοντέλο προκειμένου να βγει η προτεινόμενη τιμή χρέωσης.
+
+\begin{figure}
+    \begin{center}
+        \includegraphics[width=0.6\textwidth]{images/suggested_premium.png}
+    \end{center}
+    \caption{Οθόνη παρουσίασης προτεινόμενης τιμής χρέωσης}  
+    \label{fig:premium}  
+\end{figure}
+
+\subsection{Γενικές παρατηρήσεις για το ui}
+//κενά πεδία
 \end{document}
 

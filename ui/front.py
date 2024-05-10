@@ -12,6 +12,7 @@ from kivymd.uix.pickers import MDDockedDatePicker
 from kivy.metrics import dp
 from kivymd.uix.snackbar import MDSnackbarText
 from kivymd.uix.snackbar import MDSnackbar
+import numpy as np
 
 
 
@@ -293,9 +294,13 @@ class PriceScreen(Screen):
         licence_issue_date = self.data["main_screen"]["licence_issue_date"]
         area = self.data["main_screen"]["area"]
         prediction = eval.makePrediction(data)
+        
+
+        # Round float to two decimal places
+        rounded_prediction = np.round(prediction, 2)
         premium = self.ids.premium
-        premium.text = str(prediction)[1:-1] + " $"
-        print(prediction)
+        premium.text = str(rounded_prediction)[1:-1] + " €"
+        print(rounded_prediction)
     
 
 class ScreenManager(ScreenManager):
