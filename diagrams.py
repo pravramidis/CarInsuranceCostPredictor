@@ -257,24 +257,42 @@ def add_stats_to_plot(ax, data):
 #     # Show the plot
 #     plt.show()
 
-# Plotting the distribution of the 'Length' feature
-plt.figure(figsize=(10, 6))
-ax_length = sns.histplot(data['Length'], kde=True, bins=20, color='blue')
-plt.title('Distribution of Length')
-plt.xlabel('Length')
-plt.ylabel('Frequency')
-# Add statistics to the plot
-add_stats_to_plot(ax_length, data['Length'])
-# Show the plot
-plt.show()
+# # Plotting the distribution of the 'Length' feature
+# plt.figure(figsize=(10, 6))
+# ax_length = sns.histplot(data['Length'], kde=True, bins=20, color='blue')
+# plt.title('Distribution of Length')
+# plt.xlabel('Length')
+# plt.ylabel('Frequency')
+# # Add statistics to the plot
+# add_stats_to_plot(ax_length, data['Length'])
+# # Show the plot
+# plt.show()
 
-# Plotting the distribution of the 'Age' feature
-plt.figure(figsize=(10, 6))
-ax_age = sns.histplot(data['Age'], kde=True, bins=20, color='orange')
-plt.title('Distribution of Age')
-plt.xlabel('Age')
-plt.ylabel('Frequency')
-# Add statistics to the plot
-add_stats_to_plot(ax_age, data['Age'])
-# Show the plot
-plt.show()
+# # Plotting the distribution of the 'Age' feature
+# plt.figure(figsize=(10, 6))
+# ax_age = sns.histplot(data['Age'], kde=True, bins=20, color='orange')
+# plt.title('Distribution of Age')
+# plt.xlabel('Age')
+# plt.ylabel('Frequency')
+# # Add statistics to the plot
+# add_stats_to_plot(ax_age, data['Age'])
+# # Show the plot
+# plt.show()
+
+# Plotting distributions for categorical columns
+for column in categoricalColumns:
+    plt.figure(figsize=(10, 6))
+    sns.countplot(data=data, x=column, palette='coolwarm')
+    plt.title(f'Distribution of {column}')
+    plt.xlabel(column)
+    plt.ylabel('Frequency')
+    plt.show()
+
+# Plotting distributions for numerical columns
+for column in numericalColumns:
+    plt.figure(figsize=(10, 6))
+    sns.histplot(data[column], kde=True, bins=20, color='blue')
+    plt.title(f'Distribution of {column}')
+    plt.xlabel(column)
+    plt.ylabel('Frequency')
+    plt.show()
