@@ -23,6 +23,17 @@ filename = "Motor_vehicle_insurance_data.csv"
 # Reading the CSV file
 data = pd.read_csv(filename, sep=';')
 
+def definition_of_type_risk(number):
+    if number == 1:
+        return "Motorbike"
+    elif number == 2:
+        return "Van"
+    elif number == 3:
+        return "Passenger Car"
+    elif number == 4:
+        return "Agricultural Vehicle"
+    else:
+        return "All"
 # Feature engineering
 last_renewal_day = pd.to_datetime(data['Date_last_renewal'], format='%d/%m/%Y')
 last_renewal_year = last_renewal_day.dt.year
@@ -89,23 +100,11 @@ data.info()
 features = data.drop(columns=['Premium'])
 labels = data['Premium']
 
-features_preprocessed = preprocessor.fit_transform(features)
+features_preprocessed = preprocessor.fit(features)
 
-X_train, X_test, y_train, y_test = train_test_split(features_preprocessed, labels, test_size=0.2, random_state=42)
-
-# Convert features and labels to PyTorch tensors
-X_train_tensor = torch.tensor(X_train, dtype=torch.float32, device=device)
-y_train_tensor = torch.tensor(y_train.values, dtype=torch.float32, device=device).unsqueeze(1)
-
-# Create a TensorDataset
-train_dataset = TensorDataset(X_train_tensor, y_train_tensor)
-
-# Define batch size for the DataLoader
 batch_size = 64
 epochs = 10
 
-# Create DataLoader
-train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 
 class NeuralNet(nn.Module):
     def __init__(self, input_size, num_numerical_cols, categorical_columns, data, output_size):
@@ -173,11 +172,7 @@ embedding_sizes = [(len(data[column].unique()) + 1, min(50, (len(data[column].un
 # Initialize the neural network
 input_size = len(numericalColumns) + sum(embedding_size for _, embedding_size in embedding_sizes)
 output_size = 1  # For regression
-model = NeuralNet(input_size, len(numericalColumns), categoricalColumns, data, output_size).to(device)
-
-# Define loss function and optimizer
 criterion = nn.MSELoss()  # Mean Squared Error loss for regression
-optimizer = optim.Adam(model.parameters(), lr=0.001)
 
 # Define training loop
 def train_model(model, criterion, optimizer, train_loader, epochs):
@@ -216,7 +211,7 @@ def train_model(model, criterion, optimizer, train_loader, epochs):
         print(f"Epoch {epoch + 1}/{epochs}, Loss: {running_loss / len(train_loader):.4f}, MAE: {mean_mae:.4f}, R-squared: {r2:.4f}")
 
 # Define evaluation function
-def evaluate_model(model, X_test, y_test):
+def evaluate_model(model, X_test, y_test, risk_type):
     model.eval()  # Set the model to evaluation mode
     with torch.no_grad():
         # Split the features into numerical and categorical components
@@ -240,6 +235,7 @@ def evaluate_model(model, X_test, y_test):
         # Calculate Mean Absolute Error
         mae = mean_absolute_error(y_test, outputs.cpu().numpy())
         print(f"Mean Absolute Error on Test Set: {mae}")
+        type_defined = definition_of_type_risk(risk_type)
 
         threshold_values = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
         # Calculate percentage within threshold
@@ -250,21 +246,75 @@ def evaluate_model(model, X_test, y_test):
             percentages_within_threshold.append(within_threshold)
             print(f"Percentage of predictions within {threshold}% of the actual value: {within_threshold}")
 
-        # Plotting
-        plt.figure(figsize=(8, 6))
-        plt.plot(threshold_values, percentages_within_threshold)
-        plt.title('Percentage of Predictions within Threshold')
-        plt.xlabel('Threshold (%)')
-        plt.ylabel('Percentage within the Threshold')
-        plt.grid(True)
-        plt.savefig(f'report\\images\\neural_network_all_thresholds.png')
-        plt.show()
+        return percentages_within_threshold
 
 
+# Get unique values of 'Type_risk' column
+risk_types = data['Type_risk'].unique()
 
-        
-# Train the model
-train_model(model, criterion, optimizer, train_loader, epochs)
+# Dictionary to store models and corresponding datasets
+models = {}
+datasets = {}
 
-# Evaluate the model
-evaluate_model(model, X_test, y_test)
+# Loop through each risk type
+for risk_type in risk_types:
+    # Filter data based on risk type
+    risk_data = data[data['Type_risk'] == risk_type]
+    
+    # Separate features and labels
+    risk_features = risk_data.drop(columns=['Premium'])
+    risk_labels = risk_data['Premium']
+    
+    # Preprocess features
+    risk_features_preprocessed = preprocessor.transform(risk_features)
+    
+    # Split into train and test sets
+    X_train_risk, X_test_risk, y_train_risk, y_test_risk = train_test_split(
+        risk_features_preprocessed, risk_labels, test_size=0.2, random_state=42)
+    
+    # Create TensorDatasets
+    train_dataset_risk = TensorDataset(
+        torch.tensor(X_train_risk, dtype=torch.float32, device=device),
+        torch.tensor(y_train_risk.values, dtype=torch.float32, device=device).unsqueeze(1)
+    )
+    
+    # Save dataset
+    datasets[risk_type] = (train_dataset_risk, X_test_risk, y_test_risk)
+    
+    # Initialize and train model
+    model_risk = NeuralNet(input_size, len(numericalColumns), categoricalColumns, risk_data, output_size).to(device)
+    optimizer_risk = optim.Adam(model_risk.parameters(), lr=0.001)
+    train_model(model_risk, criterion, optimizer_risk, DataLoader(train_dataset_risk, batch_size=batch_size, shuffle=True), epochs)
+    
+    # Save trained model
+    models[risk_type] = model_risk
+
+# Evaluate each model
+for risk_type, (train_dataset_risk, X_test_risk, y_test_risk) in datasets.items():
+    print(f"Evaluating model for risk type: {risk_type}")
+    evaluate_model(models[risk_type], X_test_risk, y_test_risk, risk_type)
+
+
+# Initialize a list to store risk_type-specific data for plotting
+plots_data = []
+
+# Evaluate each model and collect data for plotting
+for risk_type, (train_dataset_risk, X_test_risk, y_test_risk) in datasets.items():
+    print(f"Evaluating model for risk type: {risk_type}")
+    percentages_within_threshold = evaluate_model(models[risk_type], X_test_risk, y_test_risk, risk_type)
+    plots_data.append((risk_type,percentages_within_threshold))
+    
+threshold_values = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+# Plotting all graphs together
+plt.figure(figsize=(12, 8))
+for risk_type, percentages_within_threshold in plots_data:
+    type_defined = definition_of_type_risk(risk_type)
+    plt.plot(threshold_values, percentages_within_threshold, label=f'{type_defined}')
+
+plt.title('Percentage of Predictions within Threshold for All Risk Types')
+plt.xlabel('Threshold (%)')
+plt.ylabel('Percentage within the Threshold')
+plt.legend(loc='lower right') 
+plt.grid(True)
+plt.savefig('report\\images\\individual_thresholds_neural.png')
+plt.show()
