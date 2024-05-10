@@ -185,6 +185,79 @@
 
 Πρόκειται για τιμή τυχαιότητας όπως το seed στο XGBoost. Έχει επιλεγεί και εδώ η τιμή 42.
 
+\begin{table}[ht]
+    \centering
+    \begin{tabular}{l|cc}
+        \hline
+        Parameter & Before Tuning & After Tuning \\
+        \hline
+        \texttt{objective} & \texttt{reg:squarederror} & \texttt{reg:squarederror} \\
+        \texttt{eval\_metric} & \texttt{rmse} & \texttt{rmse} \\
+        \texttt{learning\_rate} & 0.05 & 0.01 \\
+        \texttt{max\_depth} & 4 & 5 \\
+        \texttt{min\_child\_weight} & 1 & 5 \\
+        \texttt{subsample} & 0.7 & 0.8 \\
+        \texttt{colsample\_bytree} & 0.7 & 0.8 \\
+        \texttt{n\_estimators} & 500 & 1000 \\
+        \texttt{seed} & 42 & 42 \\
+        \hline
+    \end{tabular}
+    \caption{XGBoost Parameter Settings Before and After Tuning}
+\end{table}
+
+\begin{table}[ht]
+    \centering
+    \begin{tabular}{lccc|ccc}
+        \hline
+        & \multicolumn{3}{c}{Before Tuning} & \multicolumn{3}{c}{After Tuning} \\
+        \hline
+        & Mean squared error & Average Absolute Error & R² Score & Mean squared error & Average Absolute Error & R² Score \\
+        \hline
+        Motorbikes & 2298.58 & 30.097 & 0.564 & 2228.745 & 29.779 & 0.5779 \\
+        Vans & 8087.68 & 61.148 & 0.367 & 7846.43 & 60.345 & 0.386 \\
+        Passenger Cars & 10776.074 & 69.165 & 0.378 & 10693.593 & 69.07 & 0.383 \\
+        Agricultural Vehicles & 356.954 & 13.416 & -0.266 & 311.899 & 12.15 & -0.1068 \\
+        \hline
+    \end{tabular}
+    \caption{XGBoost Parameter Tuning Results}
+\end{table}
+
+\begin{table}[ht]
+    \centering
+    \begin{tabular}{l|cc}
+        \hline
+        Parameter & Before Tuning & After Tuning \\
+        \hline
+        \texttt{n\_estimators} & 100 & 700 \\
+        \texttt{max\_depth} & 10 & 15 \\
+        \texttt{min\_samples\_split} & 2 & 4 \\
+        \texttt{min\_samples\_leaf} & 2 & 2 \\
+        \texttt{max\_features} & \texttt{log2} & \texttt{sqrt} \\
+        \texttt{bootstrap} & \texttt{False} & \texttt{True} \\
+        \texttt{n\_jobs} & \texttt{-1} & \texttt{-1} \\
+        \texttt{random\_state} & \texttt{42} & \texttt{42} \\
+        \hline
+    \end{tabular}
+    \caption{RandomForest Parameter Settings Before and After Tuning}
+\end{table}
+
+\begin{table}[ht]
+    \centering
+    \begin{tabular}{lccc|ccc}
+        \hline
+        & \multicolumn{3}{c}{Before Tuning} & \multicolumn{3}{c}{After Tuning} \\
+        \hline
+        & Mean squared error & Average Absolute Error & R² Score & Mean squared error & Average Absolute Error & R² Score \\
+        \hline
+        Motorbikes & 2380.952 & 30.542 & 0.549 & 2265.092 & 29.42 & 0.571 \\
+        Vans & 8345.571 & 62.057 & 0.3476 & 8184.899 & 61.395 & 0.3601 \\
+        Passenger Cars & 11551.75 & 72.0927 & 0.333 & 10923.639 & 70.2268 & 0.3701 \\
+        Agricultural Vehicles & 282.682 & 11.586 & -0.0032 & 267.008 & 11.477 & 0.0524 \\
+        \hline
+    \end{tabular}
+    \caption{Random Forest Parameter Tuning Results}
+\end{table}
+
 
 \section{Διαγράμματα}
 Τα διαγραμματα
