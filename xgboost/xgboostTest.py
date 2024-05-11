@@ -22,7 +22,19 @@ import os
 #using gpu
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-
+def definition_of_type_risk(number):
+    if number == 1:
+        return "Motorbike"
+    elif number == 2:
+        return "Van"
+    elif number == 3:
+        return "Passenger Car"
+    elif number == 4:
+        return "Agricultural Vehicle"
+    else:
+        return "All"
+    
+    
 filename = "Motor_vehicle_insurance_data.csv"
 
 #Reading the csv
@@ -230,6 +242,14 @@ for threshold in [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]:
     all_thresholds[threshold] = percentage_within_threshold
     print(f"Percentage of predictions within {threshold}% of the actual value for the whole dataset: {percentage_within_threshold}")
 
+# Store the thresholds for the whole dataset
+percentage_within_thresholds['All'] = all_thresholds
+
+# Plotting individual graphs
+for type_risk_value, thresholds in percentage_within_thresholds.items():
+    type_defined = definition_of_type_risk(type_risk_value)
+    if type_risk_value != 'All':
+        plt.plot(thresholds.keys(), thresholds.values(), label=f'{type_defined}')
 # Store the thresholds for the whole dataset
 percentage_within_thresholds['All'] = all_thresholds
 
