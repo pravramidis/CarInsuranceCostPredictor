@@ -5,6 +5,7 @@ from torch.utils.data import TensorDataset, DataLoader
 import numpy as np # linear algebra
 import seaborn as sns
 import matplotlib.pyplot as plt
+from matplotlib.ticker import FuncFormatter
 
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
@@ -195,7 +196,7 @@ def add_stats_to_plot(ax, data):
             verticalalignment='top', horizontalalignment='right',
             bbox=dict(boxstyle='round', facecolor='white', alpha=0.7))
 
-# # Label: Premium
+# # # Label: Premium
 # plt.figure(figsize=(12, 8))
 # ax = sns.histplot(data['Premium'], kde=True, bins=20)
 # plt.title('Distribution of Premium')
@@ -229,23 +230,105 @@ def add_stats_to_plot(ax, data):
 # plot_premium_by_type_risk(data, 4)  # For Type_risk = 4
 # List of categorical features
 # List of categorical features
-# categorical_features = ['Type_risk','Payment', 'Distribution_channel', 'Area', 'Second_driver']
+categorical_features = ['Payment', 'Distribution_channel', 'Second_driver']
 
 # # Numerical feature to visualize
-# numerical_feature = 'Premium'
+numerical_feature = 'Premium'
 
-# # Loop through each categorical feature and create a swarm plot
+def map_x_labels(x):
+    if x == 0:
+        return 'one driver'
+    elif x == 1:
+        return 'multiple drivers'
+    else:
+        return x
+    
+# Mapping function for x-axis labels
+def map_distribution_channel_labels(x):
+    if x == 0:
+        return 'Agent'
+    elif x == 1:
+        return 'Insurance brokers'
+    elif x ==x:
+        return 'Other'
+# Mapping function for x-axis labels
+def map_payment_labels(x):
+    if x == 0:
+        return 'Annual'
+    elif x == 1:
+        return 'Half-yearly administrative'
+    
+
+# Loop through each categorical feature and create separate plots for each Type_risk category
+for feature in categorical_features:
+    for type_risk_value in data['Type_risk'].unique():
+        # Filter the data for the given Type_risk category
+        subset_data = data[data['Type_risk'] == type_risk_value]
+
+        # Create a new plot
+        plt.figure(figsize=(12, 8))
+
+        # Create a swarm plot
+        sns.stripplot(
+            x=feature,
+            y=numerical_feature,
+            data=subset_data,
+            palette='viridis',
+            jitter=True,  # Add jitter for better separation of points
+            label=f'Type_risk = {type_risk_value}'
+        )
+
+        # Map x-axis labels for each feature
+        if feature == 'Second_driver':
+            plt.xticks(ticks=[0, 1], labels=[map_x_labels(0), map_x_labels(1)])
+        elif feature == 'Distribution_channel':
+            plt.xticks(ticks=[0, 1], labels=[map_distribution_channel_labels(0), map_distribution_channel_labels(1)])
+        elif feature == 'Payment':
+            plt.xticks(ticks=subset_data['Payment'].unique(), labels=[map_payment_labels(x) for x in subset_data['Payment'].unique()])
+
+        # Add title and labels
+        if (type_risk_value == 1):
+            plt.title(f'Distribution of {numerical_feature} by {feature} for Motorcycles', fontsize=14, pad=20)
+        elif (type_risk_value == 2):
+             plt.title(f'Distribution of {numerical_feature} by {feature} for Vans', fontsize=14, pad=20)
+        elif (type_risk_value == 3):
+             plt.title(f'Distribution of {numerical_feature} by {feature} for Passenger Cars', fontsize=14, pad=20)
+        elif (type_risk_value == 4):
+             plt.title(f'Distribution of {numerical_feature} by {feature} for Argicultular Vehicles', fontsize=14, pad=20)
+
+        plt.xlabel(feature, fontsize=12)
+
+        plt.ylabel(numerical_feature, fontsize=12)
+
+        # # Add legend
+        # plt.legend(title='Type_risk')
+
+        # Optional: Add grid lines for better readability
+        plt.grid(True, linestyle='--', alpha=0.6)
+
+        # Show the plot
+        plt.show()
+# Loop through each categorical feature and create a swarm plot
 # for feature in categorical_features:
 #     plt.figure(figsize=(12, 8))  # Adjust figure size as needed
 
 #     # Create a swarm plot
 #     sns.stripplot(
-#     x=feature,
-#     y=numerical_feature,
-#     data=data,
-#     palette='viridis',
-#     jitter=True  # Add jitter for better separation of points
-# )
+#         x=feature,
+#         y=numerical_feature,
+#         data=data,
+#         palette='viridis',
+#         jitter=True  # Add jitter for better separation of points
+#     )
+    
+#     # Map x-axis labels for 'Second_driver' feature
+#     if feature == 'Second_driver':
+#         plt.xticks(ticks=[0, 1], labels=[map_x_labels(0), map_x_labels(1)])
+#     if feature == 'Distribution_channel':
+#         plt.xticks(ticks=[0, 1], labels=[map_distribution_channel_labels(0), map_distribution_channel_labels(1)])
+#     # Map x-axis labels for 'Payment' feature
+#     if feature == 'Payment':
+#         plt.xticks(ticks=data['Payment'].unique(), labels=[map_payment_labels(x) for x in data['Payment'].unique()])
 #     # Add title and labels
 #     plt.title(f'Distribution of {numerical_feature} by {feature}', fontsize=14, pad=20)
 #     plt.xlabel(feature, fontsize=12)
@@ -256,7 +339,6 @@ def add_stats_to_plot(ax, data):
 
 #     # Show the plot
 #     plt.show()
-
 # # Plotting the distribution of the 'Length' feature
 # plt.figure(figsize=(10, 6))
 # ax_length = sns.histplot(data['Length'], kde=True, bins=20, color='blue')
@@ -280,19 +362,19 @@ def add_stats_to_plot(ax, data):
 # plt.show()
 
 # Plotting distributions for categorical columns
-for column in categoricalColumns:
-    plt.figure(figsize=(10, 6))
-    sns.countplot(data=data, x=column, palette='coolwarm')
-    plt.title(f'Distribution of {column}')
-    plt.xlabel(column)
-    plt.ylabel('Frequency')
-    plt.show()
+# for column in categoricalColumns:
+#     plt.figure(figsize=(10, 6))
+#     sns.countplot(data=data, x=column, palette='coolwarm')
+#     plt.title(f'Distribution of {column}')
+#     plt.xlabel(column)
+#     plt.ylabel('Frequency')
+#     plt.show()
 
-# Plotting distributions for numerical columns
-for column in numericalColumns:
-    plt.figure(figsize=(10, 6))
-    sns.histplot(data[column], kde=True, bins=20, color='blue')
-    plt.title(f'Distribution of {column}')
-    plt.xlabel(column)
-    plt.ylabel('Frequency')
-    plt.show()
+# # Plotting distributions for numerical columns
+# for column in numericalColumns:
+#     plt.figure(figsize=(10, 6))
+#     sns.histplot(data[column], kde=True, bins=20, color='blue')
+#     plt.title(f'Distribution of {column}')
+#     plt.xlabel(column)
+#     plt.ylabel('Frequency')
+#     plt.show()
