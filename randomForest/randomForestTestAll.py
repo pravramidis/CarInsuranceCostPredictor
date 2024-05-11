@@ -310,5 +310,5 @@ plt.barh(combined_importance_df['Feature'], combined_importance_df['Importance']
 plt.xlabel('Importance')
 plt.ylabel('Feature')
 plt.title('Variable Importance')
-plt.savefig(f'report\\images\\feature_importance_combined_random_forest.png')
+plt.savefig(f'report\\images\\feature_importance_combined_random_forest.png', bbox_inches='tight')
 plt.show()

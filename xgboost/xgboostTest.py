@@ -312,12 +312,13 @@ for type_risk_value, model in models.items():
     # Sort the DataFrame by importance in descending order
     combined_importance_df = combined_importance_df.sort_values(by='Importance', ascending=True)
 
-
+    type_defined = definition_of_type_risk(type_risk_value)
     # Plot combined feature importances
     plt.figure(figsize=(10, 6))
     plt.barh(combined_importance_df['Feature'], combined_importance_df['Importance'])
     plt.xlabel('Importance')
     plt.ylabel('Feature')
-    plt.title(f'Feature Importance for Type_risk {type_risk_value}')
+    plt.title(f'Feature Importance for {type_defined}')
+    plt.savefig(f'report\\images\\{type_defined}_feature_importance_xgb.png', bbox_inches='tight')
     plt.show()
 
