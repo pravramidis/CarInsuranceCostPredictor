@@ -308,5 +308,5 @@ for type_risk_value, model in models.items():
     plt.ylabel('Feature')
     type_defined = definition_of_type_risk(type_risk_value) 
     plt.title(f'Feature Importance for {type_defined}')
-    plt.savefig(f'report\\images\\{type_defined}_feature_importance_random_forest.png')
+    plt.savefig(f'report\\images\\{type_defined}_feature_importance_random_forest.png', bbox_inches='tight')
     plt.show()
