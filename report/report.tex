@@ -112,9 +112,51 @@
 \\ 'Cylinder\_capacity', 'Weight', 'Length', 'Type\_fuel', 'Payment', 'Contract\_year', \\'Policies\_in\_force', 'Lapse'.
 
 
+\section{Ανάλυση Δεδομένων}
+Στο πρώτο διάγραμμα [Εικ.\ref{fig:prem}] παρουσιάζεται η κατανομή των ασφαλίστρων για όλες τις καταχωρίσεις. Τα επόμενα διαγράμματα [Εικ.\ref{fig:subfigures4}] δείχνουν την κατανομή των ασφαλίστρων για κάθε κατηγορία οχήματος ξεχωριστά.
+\begin{figure}
+    \begin{center}
+        \includegraphics[width=0.8\textwidth]{images/premium.png}
+    \end{center}
+    \caption{Οθόνη prem} 
+    \label{fig:prem}   
+\end{figure}
+
+\begin{figure}[h!]
+    \centering
+     \begin{subfigure}{0.45\linewidth}
+      \includegraphics[width=\linewidth]{images/premium_risk1.png}
+      \caption{Motorbikes}
+      \label{fig:subfig1}
+     \end{subfigure}
+     \begin{subfigure}{0.45\linewidth}
+      \includegraphics[width=\linewidth]{images/premium_risk2.png}
+      \caption{Vans}
+      \label{fig:subfig2}
+      \end{subfigure}
+  \vfill
+       \begin{subfigure}{0.45\linewidth}
+       \includegraphics[width=\linewidth]{images/premium_risk3.png}
+       \caption{Passenger cars}
+       \label{fig:subfig3}
+        \end{subfigure}
+         \begin{subfigure}{0.45\linewidth}
+        \includegraphics[width=\linewidth]{images/premium_risk4.png}
+        \caption{Agricultural Vehicles}
+        \label{fig:subfig4}
+         \end{subfigure}
+  \caption{Comparison of Different Vehicle Types}
+  \label{fig:subfigures4}
+\end{figure}
+
+
+\begin{observation}
+    \label{observation:first}
+    Εύκολα διαπιστώνεται από το πρώτο ολικό διάγραμμα ότι οι ασφαλιστικές τιμές πάνω από 500 είναι ελάχιστες και δεν επηρεάζουν σημαντικά το τελικό αποτέλεσμα. Ωστόσο, όταν κατηγοριοποιήσαμε τα δεδομένα, παρατηρήσαμε ότι η διασπορά των τιμών στα αγροτικά οχήματα ήταν μεγαλύτερη, με αποτέλεσμα η διαφοροποίηση του μοντέλου ανά κατηγορία οχήματος να είναι απαραίτητη.
+\end{observation}
 
 \section{Εκπαίδευση μοντέλων}
-Αρχικά εκπαιδεύσαμε τα μοντέλα με όλους τους τύπους οχημάτων και ύστερα από παρατήρηση των αποτελεσμάτων , φαινόταν καλύτερη η επιλογή να εκπαιδεύσουμε τα μοντέλα με κάθε τύπο οχήματος ξεχωριστά. Όπως φαίνεται καθαρά και από την ενότητα 5 [Εικ. \ref{fig:subfigures4}] με τα διαγράμματα και τις παρατηρήσεις τους (Παρατήρηση 1).
+Αρχικά εκπαιδεύσαμε τα μοντέλα μη διαχωρίζοντας τα ανά τύπο οχήματος ("Type\_risk"). Ύστερα από παρατήρηση των αποτελεσμάτων , φαινόταν καλύτερη η επιλογή να εκπαιδεύσουμε τα μοντέλα για κάθε τύπο οχήματος ξεχωριστά, όπως εξηγείται και στην Παρατήρηση [\ref{observation:first}].
 
 \subsection{XGBoost}
 Το πρώτο μοντέλο πρόβλεψης που χρησιμοποιήσαμε ήταν το XGBoost. Παρακάτω αναφέρονται οι παράμετροι που επιλέχθηκαν για το συγκεκριμένο μοντέλο, ενώ στις παρενθέσεις βρίσκεται το συνηθισμένο εύρος τιμών, δηλαδή το εύρος που έγιναν οι δοκιμές για να πετύχουμε το βέλτιστο αποτέλεσμα.\\
@@ -253,7 +295,8 @@
 το δίκτυο χρησιμοποιεί embeddings για τα κατηγορικά χαρακτηριστικά, μετατρέποντάς τα σε αριθμητική μορφή βάσει συγκεκριμένου μεγέθους ενσωμάτωσης.
 Τα αριθμητικά χαρακτηριστικά και οι ενσωματώσεις των κατηγορικών χαρακτηριστικών συνδυάζονται σε ένα ενιαίο σύνολο εισόδων. Το νευρωνικό δίκτυο αποτελείται από πολλά πλήρως συνδεδεμένα στρώματα 
 με διαφορετικό αριθμό μονάδων, μειώνοντας σταδιακά τους νευρώνες, ενώ χρησιμοποιείται στρώμα dropout για την τυχαία απενεργοποίηση ορισμένων νευρώνων, προλαμβάνοντας το overfitting.\\
-% Τα δεδομένα περνούν από τα στρώματα με ενεργοποίηση ReLU και dropout. Το μοντέλο εκπαιδεύεται σε πολλούς κύκλους (epochs) σε παρτίδες (batch_size), όπου εκτελεί προώθηση (forward pass), υπολογίζει την Loss, και πραγματοποιεί οπισθοδρόμηση (backward pass) για την ενημέρωση των βαρών του μοντέλου. Μετά από κάθε κύκλο εκπαίδευσης, υπολογίζονται μετρήσεις απόδοσης όπως η Μέση Απόλυτη Απόκλιση (MAE) και το R-squared (R2).
+Τα δεδομένα περνούν από τα στρώματα με ενεργοποίηση ReLU και dropout. Το μοντέλο εκπαιδεύεται σε πολλούς κύκλους (epochs) σε παρτίδες (batch\_size), όπου εκτελεί προώθηση (forward pass), υπολογίζει την Loss, 
+και πραγματοποιεί οπισθοδρόμηση (backward pass) για την ενημέρωση των βαρών του μοντέλου. Μετά από κάθε κύκλο εκπαίδευσης, υπολογίζονται μετρήσεις απόδοσης όπως η Μέση Απόλυτη Απόκλιση (MAE) και το R-squared (R2).
 
 \begin{table}[h!]
     \centering
@@ -270,206 +313,12 @@
     \caption{Neural Network Performance Metrics}
 \end{table}
 
-\section{Διαγράμματα}
-
-\includegraphics[width=1\textwidth, keepaspectratio]{images/premium.png}
-
-\begin{figure}[h!]
-    \centering
-     \begin{subfigure}{0.45\linewidth}
-      \includegraphics[width=\linewidth]{images/premium_risk1.png}
-      \caption{Motorbikes}
-      \label{fig:subfig1}
-     \end{subfigure}
-     \begin{subfigure}{0.45\linewidth}
-      \includegraphics[width=\linewidth]{images/premium_risk2.png}
-      \caption{Vans}
-      \label{fig:subfig2}
-      \end{subfigure}
-  \vfill
-       \begin{subfigure}{0.45\linewidth}
-       \includegraphics[width=\linewidth]{images/premium_risk3.png}
-       \caption{Passenger cars}
-       \label{fig:subfig3}
-        \end{subfigure}
-         \begin{subfigure}{0.45\linewidth}
-        \includegraphics[width=\linewidth]{images/premium_risk4.png}
-        \caption{Agricultural Vehicles}
-        \label{fig:subfig4}
-         \end{subfigure}
-  \caption{Comparison of Different Vehicle Types}
-  \label{fig:subfigures4}
-\end{figure}
-
-
-\begin{observation}
-    Στο πρώτο διάγραμμα παρουσιάζεται η κατανομή των ασφαλίστρων για όλες τις καταχωρίσεις. Τα επόμενα διαγράμματα δείχνουν την κατανομή των ασφαλίστρων για κάθε κατηγορία οχημάτων ξεχωριστά.
-
-    Εύκολα διαπιστώνεται από το πρώτο ολικό διάγραμμα ότι οι ασφαλιστικές τιμές πάνω από 500 είναι ελάχιστες και δεν επηρεάζουν σημαντικά το τελικό αποτέλεσμα. Ωστόσο, όταν κατηγοριοποιήσαμε τα δεδομένα, παρατηρήσαμε ότι η διασπορά των τιμών στα αγροτικά οχήματα ήταν μεγαλύτερη, με αποτέλεσμα η διαφοροποίηση του μοντέλου ανά κατηγορία οχήματος να είναι απαραίτητη.
-\end{observation}
-
-\section{User Interface}
-Το user interface της εφαρμογής αναπτύχθηκε με χρήση της Python και ειδικότερα του framework Kivy, καθώς και της συλλογής από γραφικά στοιχεία KivyMD. Στην εφαρμογή μας υπάρχουν πέντε διαφορετικές "οθόνες":
-\begin{enumerate}
-    \item Η οθόνη του login
-    \item Η οθόνη συμπλήρωσης στοιχείων του πελάτη που πρόκειται να ασφαλίσει το όχημά του.
-    \item Η οθόνη συμπλήρωσης στοιχείων του οχήματος που πρόκειται να ασφαλιστεί.
-    \item Η οθόνη συμπλήρωσης στοιχείων παλαιότερων συμβολαίων που είχε ο πελάτης στην εταιρεία.
-    \item Η οθόνη παρουσίασης της προτεινόμενης ετήσιας τιμής χρέωσης του πελάτη με βάση τα στοιχεία που συμπληρώθηκαν.
-\end{enumerate}
-
-\subsection{Login}
-Η οθόνη του login είναι η αρχική οθόνη της εφαρμογής [Εικ. \ref{fig:login}] στην οποία ο χρήστης - υπάλληλος της εταιρείας θα πρέπει να συμπληρώσει τα σωστά στοιχεία συνδεσής του (username και password) και στην συνέχεια να πατήσει το κουμπί "LOG IN". Σε περίπτωση που ένα από τα δύο πεδία μείνει κενό, ο χρήστης θα λάβει το αντίστοιχο μήνυμα λάθους [Εικ. \ref{fig:empty}].
-Σε περίπτωση που τα στοιχεία σύνδεσης δεν είναι σωστά, ο χρήστης θα λάβει διαφορετικό μήνυμα λάθους [Εικ. \ref{fig:match}].
-
-Έχει προβλεφθεί και δημιοθργηθεί μόνο ένας λογαριασμός υπαλλήλου. 'Ετσι, για να πάμε στην επόμενη οθόνη θα πρέπει να συμπληρώσουμε στο πεδίο username: \textbf{admin\_1} και στο πεδίο password: \textbf{12345}. Αφού συμπληρώσουμε αυτά τα στοιχεία σωστά και πατήσουμε το κουμπί "LOG IN" μεταφερόμαστε στην δεύτερη οθόνη [Εικ. \ref{fig:driver}].
-\begin{figure}
-    \begin{center}
-        \includegraphics[width=0.6\textwidth]{images/login.png}
-    \end{center}
-    \caption{Οθόνη login} 
-    \label{fig:login}   
-\end{figure}
-
-\begin{figure}
-    \centering
-    \begin{subfigure}{0.45\linewidth}
-        \includegraphics[width=\linewidth]{images/login_empty.png}
-        \caption{Κενό πεδίο}
-        \label{fig:empty}
-    \end{subfigure}
-    \begin{subfigure}{0.45\linewidth}
-        \includegraphics[width=\linewidth]{images/login_dont_match.png}
-        \caption{Λάθος στοιχεία}
-        \label{fig:match}
-    \end{subfigure}
-    \caption{Μηνύματα λάθους στο login}
-    \label{fig:errors}
-\end{figure}
-        
-\subsection{Στοιχεία πελάτη}
-Στην οθόνη συμπλήρωσης στοιχείων του πελάτη [Εικ. \ref{fig:driver}], ο χρήστης-υπάλληλος της εταιρείας θα πρέπει να συμπληρώσει τα στοιχεία του ανθρώπου που ενδιαφέρεται 
-να ασφαλίσει το όχημά του. Ειδικότερα, υπάρχουν δύο πεδία επιλογής ημερομηνίας ("Date of Birth", "License Issue Date"), τα οποία όταν επιλεχθούν εμφανίζεται 
-ένα ημερολόγιο [Εικ. \ref{fig:date}] προκειμένου να επιλεχθεί η κατάλληλη ημερομηνία. Πατώντας το πεδίο "Area" ο χρήστης βλέπει ένα μενού δύο επιλογών [Εικ. \ref{fig:area}] από τις οποίες θα πρέπει να επιλέξει μία.
-Στο πεδίο "Seniority" ο χρήστης θα πρέπει να πληκτρολογήσει έναν αριθμό που προσδιορίζει τα χρόνια που ο συγεκριμένος πελάτης είναι ασφαλισμένος στην εταιρεία. 
-
-Αφού συμπληρωθούν όλα τα πεδία ο χρήστης θα πρέπει να πατήσει το 
-κουμπί "NEXT" για να μεταφερθεί στην επόμενη οθόνη [Εικ. \ref{fig:vehicle}]. Σε περίπτωση που επιθυμεί να πάει στην οθόνη του login [Εικ. \ref{fig:login}] θα πρέπει να πατήσει το κουμπί "GO BACK".
-
-\begin{figure}
-    \begin{center}
-        \includegraphics[width=0.6\textwidth]{images/driver.png}
-    \end{center}
-    \caption{Οθόνη συμπλήρωσης στοιχείων πελάτη}  
-    \label{fig:driver}  
-\end{figure}
-
-\begin{figure}
-    \centering
-    \begin{subfigure}{0.45\linewidth}
-        \includegraphics[width=\linewidth]{images/driver_datepicker.png}
-        \caption{Ημερολόγιο}
-        \label{fig:date}
-    \end{subfigure}
-    \begin{subfigure}{0.45\linewidth}
-        \includegraphics[width=\linewidth]{images/driver_area.png}
-        \caption{Μενού επιλογών}
-        \label{fig:area}
-    \end{subfigure}
-    \caption{Παραδείγματα εισόδου}
-    \label{fig:driver_examples}
-\end{figure}
-
-
-\subsection{Στοιχεία οχήματος}
-Σε αυτήν την οθόνη [Εικ. \ref{fig:vehicle}], ο χρήστης-υπάλληλος της εταιρείας θα πρέπει να συμπληρώσει τα στοιχεία του οχήματος το οποίο επιθυμεί να ασφαλίσει ο πελάτης. Ειδικότερα, για τα πεδία 
-"Type of vehicle", "Type of fuel", "Second driver" ο χρήστης θα πρέπει να πατήσει καθένα από αυτά τα πεδία και να επιλέξει μία από τις επιλογές που εμφανίζονται στο κάθε μενού επιλογών (ενδεικτικά [Εικ. \ref{fig:type}]). 
-Στα υπόλοιπα πεδία ο χρήστης θα πρέπει να πληκτρολογήσει έναν αριθμό σύμφωνα με τις υποδείξεις του κάθε πεδίου (ενδεικτικά [Εικ. \ref{fig:reg}]).
-
-Για να μεταβεί στην επόμενη οθόνη [Εικ. \ref{fig:contract}] θα πρέπει να πατήσει το κουμπί "NEXT" ενώ για να πάει στην προηγούμενη οθόνη [Εικ. \ref{fig:driver}] συμπλήρωσης των στοιχείων του πελάτη θα πρέπει να πατήσει το κουμπί "GO BACK".
-
-\begin{figure}
-    \begin{center}
-        \includegraphics[width=0.6\textwidth]{images/vehicle.png}
-    \end{center}
-    \caption{Οθόνη συμπλήρωσης στοιχείων οχήματος προς ασφάλιση}  
-    \label{fig:vehicle}  
-\end{figure}
-
-\begin{figure}
-    \centering
-    \begin{subfigure}{0.45\linewidth}
-        \includegraphics[width=\linewidth]{images/vehicle_type.png}
-        \caption{Παράδειγμα μενού επιλογών}
-        \label{fig:type}
-    \end{subfigure}
-    \begin{subfigure}{0.45\linewidth}
-        \includegraphics[width=\linewidth]{images/vehicle_reg_year.png}
-        \caption{Παράδειγμα συμπλήρωσης πεδίου}
-        \label{fig:reg}
-    \end{subfigure}
-    \caption{Παραδείγματα εισόδου}
-    \label{fig:vehicle_examples}
-\end{figure}
-
-\newpage
-\subsection{Στοιχεία συμβολαίου}
-Στην οθόνη συμπληρωσης στοιχείων συμβολαίου [Εικ. \ref{fig:contract}] ο χρήστης-υπάλληλος της εταιρείας θα πρέπει να συμπληρώσει στοιχεία που αφορούν παλαιότερα συμβόλαια που είχε ο πελάτης στην εταιρεία.
-Υπάρχουν τρία πεδία επιλογής ημερομηνίας ("Start Contract", "Last renewal", "Next renewal"), τα οποία όταν επιλεχθούν εμφανίζεται ημερολόγιο (ενδεικτικά [Εικ. \ref{fig:con_date}]). Τα πεδία "Distribution Channel" και "Payment" είναι πεδία που
-κατά την επιλογή τους εμφανίζεται μενού επιλογών (ενδεικτικά [Εικ. \ref{fig:pay}]), ενώ τα υπόλοιπα πρέπει να συμπληρωθούν με πληκτρολόγηση σύμφωνα με τις υποδείξεις των πεδίων.
-
-Για την μετάβαση στην προηγούμενη οθόνη [Εικ. \ref{fig:vehicle}] ο χρήστης θα πρέπει να πατήσει το κουμπί "GO BACK". Διαφορετικά, βρισκόμαστε στο σημείο που έχουν συμπληρωθεί όλα τα στοιχεία και ο χρήστης θα πρέπει να πατήσει το 
-κουμπί "CALCULATE" προκειμένου να μεταβεί στην τελευταία οθόνη [Εικ. \ref{fig:premium}].
-
-\begin{figure}
-    \begin{center}
-        \includegraphics[width=0.6\textwidth]{images/contract.png}
-    \end{center}
-    \caption{Οθόνη συμπλήρωσης στοιχείων οχήματος προς ασφάλιση}  
-    \label{fig:contract}  
-\end{figure}
-
-\begin{figure}
-    \centering
-    \begin{subfigure}{0.45\linewidth}
-        \includegraphics[width=\linewidth]{images/contract_date.png}
-        \caption{Παράδειγμα ημερολογίου}
-        \label{fig:con_date}
-    \end{subfigure}
-    \begin{subfigure}{0.45\linewidth}
-        \includegraphics[width=\linewidth]{images/contract_pay.png}
-        \caption{Παράδειγμα μενού επιλογών}
-        \label{fig:pay}
-    \end{subfigure}
-    \caption{Παραδείγματα εισόδου}
-    \label{fig:contract_examples}
-\end{figure}
-
-\newpage
-\subsection {Οθόνη προτινόμενης χρέωσης}
-Σε αυτήν την οθόνη [Εικ. \ref{fig:premium}], ο χρήστης-υπάλληλος της εταιρείας βλέπει την προτεινόμενη τιμή ασφάλισης του οχήματος που πρόκειται να ασφαλίσει ο πελάτης.
-Πατώντας το κουμπί "GO BACK" μπορεί να μεταβεί στην προήγουμενη οθόνη [Εικ. \ref{fig:contract}], ενώ πατώντας το κουμπί "LOGOUT" μεταβαίνει στην αρχική οθόνη της εφαρμογής [Εικ. \ref{fig:login}].
-
-Αξίζει να σημειωθεί πως ο χρήστης μπορεί να πηγαίνει προς τα πίσω και να αλλάζει στοιχεία ανά πάσα στιγμή. Κάθε φορά που πατά το κουμπί "CALCULATE" της προτελευταίας οθόνης [Εικ. \ref{fig:contract}], 
-όλα τα ανανεωμένα στοιχεία δίνονται στο μοντέλο προκειμένου να βγει η προτεινόμενη τιμή χρέωσης.
-
-\begin{figure}
-    \begin{center}
-        \includegraphics[width=0.6\textwidth]{images/suggested_premium.png}
-    \end{center}
-    \caption{Οθόνη παρουσίασης προτεινόμενης τιμής χρέωσης}  
-    \label{fig:premium}  
-\end{figure}
-
-\subsection{Γενικές παρατηρήσεις για το ui}
-//κενά πεδία
-
 
 \section{Oπτικοποίηση και αξιολόγηση αποτελεσμάτων}
 
 \subsection{Παρουσίαση των αποτελεσμάτων}
 
-Για την αξιολόγηση των μοντέλων χρησιμοποιήσαμε το mean squared error, το absolute error και το ποσοστό των προβλέψεων που 
+Ως μέτρα για την αξιολόγηση των μοντέλων χρησιμοποιήσαμε το mean squared error, το absolute error και το ποσοστό των προβλέψεων που η τιμή τους 
 ήταν εντός ενός ποσοστού της πραγματικής τιμής. Τα αποτελέσματα για κάθε μοντέλο όταν έχει εκπαιδευθεί στο σύνολο των δεδομένων
 φαίνονται στον πίνακα \ref{tab:3x3table} και στα διάγραμματα \ref{fig:XGBoost_result}, 
 \ref{fig:random_forest_result}, \ref{fig:neural_result}. Από αυτήν την αξιολόγηση φαίνεται ότι το πιο ακριβές μοντέλο
@@ -769,6 +618,165 @@ Random Forest καθώς και ότι υπήρχε πολύ χαμηλή ακρ
 Αξιοσημείωτο είναι και ότι το ιστορικό ατυχημάτων και το πόσα χρόνια έχει κάποιος την 
 ίδια ασφαλιστική πολιτική δεν επηρεάζουν πολύ την τελική τιμή 
 σε σχέση με άλλες παραμέτρους.
+
+
+\section{User Interface και Οδηγίες Χρήσης}
+Το user interface της εφαρμογής αναπτύχθηκε με χρήση της Python και ειδικότερα του framework Kivy, καθώς και της συλλογής από γραφικά στοιχεία KivyMD. Στην εφαρμογή μας υπάρχουν πέντε διαφορετικές "οθόνες":
+\begin{enumerate}
+    \item Η οθόνη του login
+    \item Η οθόνη συμπλήρωσης στοιχείων του πελάτη που πρόκειται να ασφαλίσει το όχημά του.
+    \item Η οθόνη συμπλήρωσης στοιχείων του οχήματος που πρόκειται να ασφαλιστεί.
+    \item Η οθόνη συμπλήρωσης στοιχείων παλαιότερων συμβολαίων που είχε ο πελάτης στην εταιρεία.
+    \item Η οθόνη παρουσίασης της προτεινόμενης ετήσιας τιμής χρέωσης του πελάτη με βάση τα στοιχεία που συμπληρώθηκαν.
+\end{enumerate}
+
+\subsection{Login}
+Η οθόνη του login είναι η αρχική οθόνη της εφαρμογής [Εικ. \ref{fig:login}] στην οποία ο χρήστης - υπάλληλος της εταιρείας θα πρέπει να συμπληρώσει τα σωστά στοιχεία συνδεσής του (username και password) και στην συνέχεια να πατήσει το κουμπί "LOG IN". Σε περίπτωση που ένα από τα δύο πεδία μείνει κενό, ο χρήστης θα λάβει το αντίστοιχο μήνυμα λάθους [Εικ. \ref{fig:empty}].
+Σε περίπτωση που τα στοιχεία σύνδεσης δεν είναι σωστά, ο χρήστης θα λάβει διαφορετικό μήνυμα λάθους [Εικ. \ref{fig:match}].
+
+Έχει προβλεφθεί και δημιοθργηθεί μόνο ένας λογαριασμός υπαλλήλου. 'Ετσι, για να πάμε στην επόμενη οθόνη θα πρέπει να συμπληρώσουμε στο πεδίο username: \textbf{admin\_1} και στο πεδίο password: \textbf{12345}. Αφού συμπληρώσουμε αυτά τα στοιχεία σωστά και πατήσουμε το κουμπί "LOG IN" μεταφερόμαστε στην δεύτερη οθόνη [Εικ. \ref{fig:driver}].
+\begin{figure}
+    \begin{center}
+        \includegraphics[width=0.6\textwidth]{images/login.png}
+    \end{center}
+    \caption{Οθόνη login} 
+    \label{fig:login}   
+\end{figure}
+
+\begin{figure}
+    \centering
+    \begin{subfigure}{0.45\linewidth}
+        \includegraphics[width=\linewidth]{images/login_empty.png}
+        \caption{Κενό πεδίο}
+        \label{fig:empty}
+    \end{subfigure}
+    \begin{subfigure}{0.45\linewidth}
+        \includegraphics[width=\linewidth]{images/login_dont_match.png}
+        \caption{Λάθος στοιχεία}
+        \label{fig:match}
+    \end{subfigure}
+    \caption{Μηνύματα λάθους στο login}
+    \label{fig:errors}
+\end{figure}
+        
+\subsection{Στοιχεία πελάτη}
+Στην οθόνη συμπλήρωσης στοιχείων του πελάτη [Εικ. \ref{fig:driver}], ο χρήστης-υπάλληλος της εταιρείας θα πρέπει να συμπληρώσει τα στοιχεία του ανθρώπου που ενδιαφέρεται 
+να ασφαλίσει το όχημά του. Ειδικότερα, υπάρχουν δύο πεδία επιλογής ημερομηνίας ("Date of Birth", "License Issue Date"), τα οποία όταν επιλεχθούν εμφανίζεται 
+ένα ημερολόγιο [Εικ. \ref{fig:date}] προκειμένου να επιλεχθεί η κατάλληλη ημερομηνία. Πατώντας το πεδίο "Area" ο χρήστης βλέπει ένα μενού δύο επιλογών [Εικ. \ref{fig:area}] από τις οποίες θα πρέπει να επιλέξει μία.
+Στο πεδίο "Seniority" ο χρήστης θα πρέπει να πληκτρολογήσει έναν αριθμό που προσδιορίζει τα χρόνια που ο συγεκριμένος πελάτης είναι ασφαλισμένος στην εταιρεία. 
+
+Αφού συμπληρωθούν όλα τα πεδία ο χρήστης θα πρέπει να πατήσει το 
+κουμπί "NEXT" για να μεταφερθεί στην επόμενη οθόνη [Εικ. \ref{fig:vehicle}]. Σε περίπτωση που επιθυμεί να πάει στην οθόνη του login [Εικ. \ref{fig:login}] θα πρέπει να πατήσει το κουμπί "GO BACK".
+
+\begin{figure}
+    \begin{center}
+        \includegraphics[width=0.6\textwidth]{images/driver.png}
+    \end{center}
+    \caption{Οθόνη συμπλήρωσης στοιχείων πελάτη}  
+    \label{fig:driver}  
+\end{figure}
+
+\begin{figure}
+    \centering
+    \begin{subfigure}{0.45\linewidth}
+        \includegraphics[width=\linewidth]{images/driver_datepicker.png}
+        \caption{Ημερολόγιο}
+        \label{fig:date}
+    \end{subfigure}
+    \begin{subfigure}{0.45\linewidth}
+        \includegraphics[width=\linewidth]{images/driver_area.png}
+        \caption{Μενού επιλογών}
+        \label{fig:area}
+    \end{subfigure}
+    \caption{Παραδείγματα εισόδου}
+    \label{fig:driver_examples}
+\end{figure}
+
+
+\subsection{Στοιχεία οχήματος}
+Σε αυτήν την οθόνη [Εικ. \ref{fig:vehicle}], ο χρήστης-υπάλληλος της εταιρείας θα πρέπει να συμπληρώσει τα στοιχεία του οχήματος το οποίο επιθυμεί να ασφαλίσει ο πελάτης. Ειδικότερα, για τα πεδία 
+"Type of vehicle", "Type of fuel", "Second driver" ο χρήστης θα πρέπει να πατήσει καθένα από αυτά τα πεδία και να επιλέξει μία από τις επιλογές που εμφανίζονται στο κάθε μενού επιλογών (ενδεικτικά [Εικ. \ref{fig:type}]). 
+Στα υπόλοιπα πεδία ο χρήστης θα πρέπει να πληκτρολογήσει έναν αριθμό σύμφωνα με τις υποδείξεις του κάθε πεδίου (ενδεικτικά [Εικ. \ref{fig:reg}]).
+
+Για να μεταβεί στην επόμενη οθόνη [Εικ. \ref{fig:contract}] θα πρέπει να πατήσει το κουμπί "NEXT" ενώ για να πάει στην προηγούμενη οθόνη [Εικ. \ref{fig:driver}] συμπλήρωσης των στοιχείων του πελάτη θα πρέπει να πατήσει το κουμπί "GO BACK".
+
+\begin{figure}
+    \begin{center}
+        \includegraphics[width=0.6\textwidth]{images/vehicle.png}
+    \end{center}
+    \caption{Οθόνη συμπλήρωσης στοιχείων οχήματος προς ασφάλιση}  
+    \label{fig:vehicle}  
+\end{figure}
+
+\begin{figure}
+    \centering
+    \begin{subfigure}{0.45\linewidth}
+        \includegraphics[width=\linewidth]{images/vehicle_type.png}
+        \caption{Παράδειγμα μενού επιλογών}
+        \label{fig:type}
+    \end{subfigure}
+    \begin{subfigure}{0.45\linewidth}
+        \includegraphics[width=\linewidth]{images/vehicle_reg_year.png}
+        \caption{Παράδειγμα συμπλήρωσης πεδίου}
+        \label{fig:reg}
+    \end{subfigure}
+    \caption{Παραδείγματα εισόδου}
+    \label{fig:vehicle_examples}
+\end{figure}
+
+\newpage
+\subsection{Στοιχεία συμβολαίου}
+Στην οθόνη συμπληρωσης στοιχείων συμβολαίου [Εικ. \ref{fig:contract}] ο χρήστης-υπάλληλος της εταιρείας θα πρέπει να συμπληρώσει στοιχεία που αφορούν παλαιότερα συμβόλαια που είχε ο πελάτης στην εταιρεία.
+Υπάρχουν τρία πεδία επιλογής ημερομηνίας ("Start Contract", "Last renewal", "Next renewal"), τα οποία όταν επιλεχθούν εμφανίζεται ημερολόγιο (ενδεικτικά [Εικ. \ref{fig:con_date}]). Τα πεδία "Distribution Channel" και "Payment" είναι πεδία που
+κατά την επιλογή τους εμφανίζεται μενού επιλογών (ενδεικτικά [Εικ. \ref{fig:pay}]), ενώ τα υπόλοιπα πρέπει να συμπληρωθούν με πληκτρολόγηση σύμφωνα με τις υποδείξεις των πεδίων.
+
+Για την μετάβαση στην προηγούμενη οθόνη [Εικ. \ref{fig:vehicle}] ο χρήστης θα πρέπει να πατήσει το κουμπί "GO BACK". Διαφορετικά, βρισκόμαστε στο σημείο που έχουν συμπληρωθεί όλα τα στοιχεία και ο χρήστης θα πρέπει να πατήσει το 
+κουμπί "CALCULATE" προκειμένου να μεταβεί στην τελευταία οθόνη [Εικ. \ref{fig:premium}].
+
+\begin{figure}
+    \begin{center}
+        \includegraphics[width=0.6\textwidth]{images/contract.png}
+    \end{center}
+    \caption{Οθόνη συμπλήρωσης στοιχείων οχήματος προς ασφάλιση}  
+    \label{fig:contract}  
+\end{figure}
+
+\begin{figure}
+    \centering
+    \begin{subfigure}{0.45\linewidth}
+        \includegraphics[width=\linewidth]{images/contract_date.png}
+        \caption{Παράδειγμα ημερολογίου}
+        \label{fig:con_date}
+    \end{subfigure}
+    \begin{subfigure}{0.45\linewidth}
+        \includegraphics[width=\linewidth]{images/contract_pay.png}
+        \caption{Παράδειγμα μενού επιλογών}
+        \label{fig:pay}
+    \end{subfigure}
+    \caption{Παραδείγματα εισόδου}
+    \label{fig:contract_examples}
+\end{figure}
+
+\newpage
+\subsection {Οθόνη προτινόμενης χρέωσης}
+Σε αυτήν την οθόνη [Εικ. \ref{fig:premium}], ο χρήστης-υπάλληλος της εταιρείας βλέπει την προτεινόμενη τιμή ασφάλισης του οχήματος που πρόκειται να ασφαλίσει ο πελάτης.
+Πατώντας το κουμπί "GO BACK" μπορεί να μεταβεί στην προήγουμενη οθόνη [Εικ. \ref{fig:contract}], ενώ πατώντας το κουμπί "LOGOUT" μεταβαίνει στην αρχική οθόνη της εφαρμογής [Εικ. \ref{fig:login}].
+
+Αξίζει να σημειωθεί πως ο χρήστης μπορεί να πηγαίνει προς τα πίσω και να αλλάζει στοιχεία ανά πάσα στιγμή. Κάθε φορά που πατά το κουμπί "CALCULATE" της προτελευταίας οθόνης [Εικ. \ref{fig:contract}], 
+όλα τα ανανεωμένα στοιχεία δίνονται στο μοντέλο προκειμένου να βγει η προτεινόμενη τιμή χρέωσης.
+
+\begin{figure}
+    \begin{center}
+        \includegraphics[width=0.6\textwidth]{images/suggested_premium.png}
+    \end{center}
+    \caption{Οθόνη παρουσίασης προτεινόμενης τιμής χρέωσης}  
+    \label{fig:premium}  
+\end{figure}
+
+\subsection{Γενικές παρατηρήσεις για το ui}
+//κενά πεδία
+
+
 
 \section{Οδηγίες εγκατάστασης}
 
