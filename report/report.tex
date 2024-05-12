@@ -118,7 +118,7 @@
     \begin{center}
         \includegraphics[width=0.8\textwidth]{images/premium.png}
     \end{center}
-    \caption{Οθόνη prem} 
+    \caption{Κατανομή Premium} 
     \label{fig:prem}   
 \end{figure}
 
@@ -126,27 +126,51 @@
     \centering
      \begin{subfigure}{0.45\linewidth}
       \includegraphics[width=\linewidth]{images/premium_risk1.png}
-      \caption{Motorbikes}
+      \caption{Μοτοσυκλέτα}
       \label{fig:subfig1}
      \end{subfigure}
      \begin{subfigure}{0.45\linewidth}
       \includegraphics[width=\linewidth]{images/premium_risk2.png}
-      \caption{Vans}
+      \caption{Βανάκι}
       \label{fig:subfig2}
       \end{subfigure}
   \vfill
        \begin{subfigure}{0.45\linewidth}
        \includegraphics[width=\linewidth]{images/premium_risk3.png}
-       \caption{Passenger cars}
+       \caption{Επιβατικό Αυτοκίνητο}
        \label{fig:subfig3}
         \end{subfigure}
          \begin{subfigure}{0.45\linewidth}
         \includegraphics[width=\linewidth]{images/premium_risk4.png}
-        \caption{Agricultural Vehicles}
+        \caption{Αγροτικό Όχημα}
         \label{fig:subfig4}
          \end{subfigure}
-  \caption{Comparison of Different Vehicle Types}
+  \caption{Κατανομή Premium ανα κατηγορία οχήματος}
   \label{fig:subfigures4}
+\end{figure}
+
+\begin{figure}[h!]
+    \begin{center}
+        \includegraphics[width=0.8\textwidth]{images/PaymentAll.png}
+    \end{center}
+    \caption{Premium και τρόπος πληρωμής} 
+    \label{fig:premium_payment}   
+\end{figure}
+
+\begin{figure}[h!]
+    \begin{center}
+        \includegraphics[width=0.8\textwidth]{images/distributionAll.png}
+    \end{center}
+    \caption{Premium και τρόπος πληρωμής} 
+    \label{fig:premium_distribution_channel}   
+\end{figure}
+
+\begin{figure}[h!]
+    \begin{center}
+        \includegraphics[width=0.8\textwidth]{images/Second_driver_ALL.png}
+    \end{center}
+    \caption{Premium και δεύτερος οδηγός} 
+    \label{fig:premium_second_driver}   
 \end{figure}
 
 
@@ -603,10 +627,10 @@ Random Forest καθώς και ότι υπήρχε πολύ χαμηλή ακρ
 Σχετικά με την σημαντικότητα των χαρακτηριστικών είναι λογικό που προκύπτει ότι ο τρόπος πληρωμής 
 είναι το πιο σημαντικό χαρακτηριστικό στις 3 απο τις 4 κατηγορίες αφού η εξόφληση του πόσου
 για όλο τον χρόνο παρέχει μεγαλύτερη σταθερότητα στα έσοδα της ασφαλιστικής οπότε η τιμή είναι
-καλύτερη. (διάγραμμα που δεν έχω βάλει ακόμα)
+καλύτερη. [Διάγραμμα \ref{fig:premium_payment}]
 Παρατηρούμε επίσης ότι μεγάλη σημασία έχει και ο τρόπος που αγοράστικε η ασφάλεια αφού 
 όσοι αγόρασαν την ασφάλεια κατευθείαν από την εταιρία έχουν καλύτερη τιμή απο όσους την 
-αγόρασαν από τρίτους.(διάγραμμα που δεν έχω βάλει ακόμα)
+αγόρασαν από τρίτους.[Διάγραμμα \ref{fig:premium_distribution_channel}]
 Σημαντική είναι και η συνολική αξία του οχήματος αφού όσο πιο ακριβό είναι τόσο πιο πολύ
 κοστίζει η επισκευή. Παρατηρούμε ότι αυτό είναι σημαντικότερος παράγοντας απόφασης στις
 κατηγορίες με μεγαλύτερο εύρος αξιών.
