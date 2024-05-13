@@ -107,10 +107,21 @@
 Διαχειριστήκαμε την απουσία τιμών με δύο τρόπους. Στην στήλη 'Length' αντικαταστήσαμε τα κενά πεδία με τον μέσο όρο των τιμών της στήλης. Στην στήλη 'Type\_fuel' αντικαταστήσαμε τα κενά πεδία με την τιμή 
 'Unknown'.
 
-Μετά από δοκιμές διαπιστώσαμε πως κάποιες μεταβλητές του dataset δεν συνεισέφεραν καθόλου στην βελτίωση της απόδοσης και παραλείφθηκαν. Οι στήλες που χρησιμοποιήθηκαν τελικά είναι οι: 
-'Seniority', 'Premium', 'Type\_risk', 'Area', 'Power', 'Second\_driver', 'Years\_on\_road', 'R\_claims\_history', 'Years\_on\_policy', 'accidents', 'Value\_vehicle, 'Age', 'Years\_driving', 'Distribution\_channel', 'N\_claims\_history',
-\\ 'Cylinder\_capacity', 'Weight', 'Length', 'Type\_fuel', 'Payment', 'Contract\_year', \\'Policies\_in\_force', 'Lapse'.
+Μετά από δοκιμές διαπιστώσαμε πως κάποιες μεταβλητές του dataset δεν συνεισέφεραν καθόλου στην βελτίωση της απόδοσης και παραλείφθηκαν. 
+Οι στήλες που χρησιμοποιήθηκαν τελικά είναι οι:\\
+\underline{Αριθμητικές:} 'Seniority', 'Power', 'Years\_on\_road', 'R\_claims\_history', 'Years\_on\_policy', 
+'accidents', 'Value\_vehicle, 'Age', 'Years\_driving', 'N\_claims\_history', 'Cylinder\_capacity', 
+'Weight', 'Length', 'Contract\_year', 'Policies\_in\_force'
+\\\underline{Κατηγοριματικές:} 'Type\_risk', 'Area', 'Second\_driver', 'Distribution\_channel','Type\_fuel', 'Payment', 'Lapse'
+\\\underline{Στόχος: 'Premium'}.
 
+Γιά τις αριθμητικές χρησιμοποιούμε το StandardScaler απο την βιβλιοθήκη scikit-learn το 
+οποίο κανονικοποιεί τα δεδομένα και κάνει την μέση τιμή(mean) κάθε στύλης να είναι 0 και
+την απόκλιση(variance) να είναι 1.
+
+Γιά τις κατηγοριματικές χρησιμοποιούμε το OneHotEncoder απο την βιβλιοθήκη scikit-learn 
+που δημιουργεί όσες στήλες όσες και η μοναδικές τιμές κάθε κατηγορίας και για κάθε στήλη 
+βάζει 1 αν ανήκει και 0 αν δεν ανήκει.
 
 \section{Ανάλυση Δεδομένων}
 Στο πρώτο διάγραμμα [Εικ.\ref{fig:prem}] παρουσιάζεται η κατανομή των ασφαλίστρων για όλες τις καταχωρίσεις. Τα επόμενα διαγράμματα [Εικ.\ref{fig:subfigures4}] δείχνουν την κατανομή των ασφαλίστρων για κάθε κατηγορία οχήματος ξεχωριστά.
