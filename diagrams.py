@@ -20,20 +20,41 @@ from sklearn.metrics import mean_squared_error, mean_absolute_error
 import joblib
 import datetime
 
+from sklearn.metrics import r2_score
+import joblib
+import os
+
 #using gpu
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-
+def definition_of_type_risk(number):
+    if number == 1:
+        return "Motorbike"
+    elif number == 2:
+        return "Van"
+    elif number == 3:
+        return "Passenger Car"
+    elif number == 4:
+        return "Agricultural Vehicle"
+    else:
+        return "All"
+    
+    
 filename = "Motor_vehicle_insurance_data.csv"
 
 #Reading the csv
 data = pd.read_csv(filename, sep=';')
 
+directory = "xgbModels"
+if not os.path.exists(directory):
+    os.makedirs(directory) 
 
 #ID;Date_start_contract;Date_last_renewal;Date_next_renewal;Date_birth;Date_driving_licence;
 #Distribution_channel;Seniority;Policies_in_force;Max_policies;Max_products;Lapse;Date_lapse;
 #Payment;Premium;Cost_claims_year;N_claims_year;N_claims_history;R_Claims_history;Type_risk;Area;
 #Second_driver;Year_matriculation;Power;Cylinder_capacity;Value_vehicle;N_doors;Type_fuel;Length;Weight
+
+#Feature engineering
 
 last_renewal_day = pd.to_datetime(data['Date_last_renewal'], format='%d/%m/%Y')
 last_renewal_year = last_renewal_day.dt.year
@@ -92,30 +113,36 @@ data['Years_on_policy'] = years_on_policy
 
 data['accidents'] = data['N_claims_history'] / (data['Years_on_policy'] + 1)
 
+data['Age_Years_Driving_Interaction'] = data['Age'] * data['Years_driving']
+
 
 #We combine the doors and the category into one column
 combined_values = data['Type_risk'].astype(str) + '_' + data['N_doors'].astype(str)
 data['Combined_doors_type'] = combined_values
 
-columnsToUse = ['Seniority', 'Premium', 'Type_risk', 'Area', 'Second_driver', 'Years_on_road', 'R_Claims_history', 'Years_on_policy', 'accidents',
+
+columnsToUse = ['Seniority', 'Premium', 'Type_risk', 'Area', 'Second_driver', 'Years_on_road', 'R_Claims_history', 'Years_on_policy', 'accidents', 
 			'Value_vehicle', 'Age', 'Years_driving', 'Distribution_channel', 'N_claims_history', 'Power', 'Cylinder_capacity',
 			'Weight', 'Length', 'Type_fuel', 'Payment', 'Contract_year', 'Policies_in_force', 'Lapse']
 
 data = data[columnsToUse]
 
-# data = data[(data['Type_risk'] == 3)]
+
 
 #We fill the missing length value with the mean so we can use the rest of the row
-# data['Length'].fillna(data['Length'].mean(), inplace=True)
-#We fill the missing fuel type with the most common type
-# data['Type_fuel'].fillna(data['Type_fuel'].mode()[0], inplace=True)
+data['Length'] = data['Length'].fillna(data['Length'].mean())
+
+#Replace the null values of fuel types the a third value
+null_indices = data['Type_fuel'].isnull()
+data.loc[null_indices, 'Type_fuel'] = 'Unknown'
 
 # Remove rows with empty values. There aren't many of them so this doesn't affect the data
 # data = data.dropna()
 
-categoricalColumns = ['Type_risk', 'Area', 'Second_driver', 'Distribution_channel', 'Type_fuel', 'Payment']
+categoricalColumns = [ 'Area', 'Second_driver', 'Distribution_channel', 'Type_fuel', 'Payment']
 numericalColumns = ['Seniority', 'Years_on_road','Value_vehicle','Age', 'Years_driving', 'N_claims_history', 'Power', 'Cylinder_capacity', 
 					'Weight', 'Length', 'Contract_year', 'R_Claims_history', 'Years_on_policy', 'accidents', 'Policies_in_force', 'Lapse']
+
 
 preprocessor = ColumnTransformer(
 transformers=[
@@ -196,6 +223,18 @@ def add_stats_to_plot(ax, data):
             verticalalignment='top', horizontalalignment='right',
             bbox=dict(boxstyle='round', facecolor='white', alpha=0.7))
 
+# Plotting the distribution of Type_risk
+# Map numeric values to labels in the Type_risk column
+data['Type_risk'] = data['Type_risk'].map({1: "Motorbike", 2: "Van", 3: "Passenger Car", 4: "Agricultural Vehicle"})
+
+# Plotting the distribution of Type_risk
+plt.figure(figsize=(10, 6))
+sns.countplot(data=data, x='Type_risk', palette='viridis')
+plt.title('Distribution of Type_risk')
+plt.xlabel('Type_risk')
+plt.ylabel('Count')
+plt.grid(axis='y')
+plt.show()
 # # # Label: Premium
 # plt.figure(figsize=(12, 8))
 # ax = sns.histplot(data['Premium'], kde=True, bins=20)
@@ -205,6 +244,17 @@ def add_stats_to_plot(ax, data):
 # add_stats_to_plot(ax, data['Premium'])
 # plt.show()
 
+# # Calculate average premium for each age group
+# average_premium_by_age = data.groupby('Age')['Premium'].mean()
+
+# # Plotting average premium against age
+# plt.figure(figsize=(10, 6))
+# plt.plot(average_premium_by_age.index, average_premium_by_age.values, marker='o')
+# plt.title('Average Premium vs. Age')
+# plt.xlabel('Age')
+# plt.ylabel('Average Premium')
+# plt.grid(True)
+# plt.show()
 
 # def plot_premium_by_type_risk(data, type_risk_value):
 #     # Filter the data for the given Type_risk category
@@ -230,84 +280,84 @@ def add_stats_to_plot(ax, data):
 # plot_premium_by_type_risk(data, 4)  # For Type_risk = 4
 # List of categorical features
 # List of categorical features
-categorical_features = ['Payment', 'Distribution_channel', 'Second_driver']
+# categorical_features = ['Payment', 'Distribution_channel', 'Second_driver']
 
-# # Numerical feature to visualize
-numerical_feature = 'Premium'
+# # # # Numerical feature to visualize
+# numerical_feature = 'Premium'
 
-def map_x_labels(x):
-    if x == 0:
-        return 'one driver'
-    elif x == 1:
-        return 'multiple drivers'
-    else:
-        return x
+# def map_x_labels(x):
+#     if x == 0:
+#         return 'one driver'
+#     elif x == 1:
+#         return 'multiple drivers'
+#     else:
+#         return x
     
-# Mapping function for x-axis labels
-def map_distribution_channel_labels(x):
-    if x == 0:
-        return 'Agent'
-    elif x == 1:
-        return 'Insurance brokers'
-    elif x ==x:
-        return 'Other'
-# Mapping function for x-axis labels
-def map_payment_labels(x):
-    if x == 0:
-        return 'Annual'
-    elif x == 1:
-        return 'Half-yearly administrative'
+# # Mapping function for x-axis labels
+# def map_distribution_channel_labels(x):
+#     if x == 0:
+#         return 'Agent'
+#     elif x == 1:
+#         return 'Insurance brokers'
+#     elif x ==x:
+#         return 'Other'
+# # Mapping function for x-axis labels
+# def map_payment_labels(x):
+#     if x == 0:
+#         return 'Annual'
+#     elif x == 1:
+#         return 'Half-yearly administrative'
     
 
-# Loop through each categorical feature and create separate plots for each Type_risk category
-for feature in categorical_features:
-    for type_risk_value in data['Type_risk'].unique():
-        # Filter the data for the given Type_risk category
-        subset_data = data[data['Type_risk'] == type_risk_value]
+# # Loop through each categorical feature and create separate plots for each Type_risk category
+# for feature in categorical_features:
+#     for type_risk_value in data['Type_risk'].unique():
+#         # Filter the data for the given Type_risk category
+#         subset_data = data[data['Type_risk'] == type_risk_value]
 
-        # Create a new plot
-        plt.figure(figsize=(12, 8))
+#         # Create a new plot
+#         plt.figure(figsize=(12, 8))
 
-        # Create a swarm plot
-        sns.stripplot(
-            x=feature,
-            y=numerical_feature,
-            data=subset_data,
-            palette='viridis',
-            jitter=True,  # Add jitter for better separation of points
-            label=f'Type_risk = {type_risk_value}'
-        )
+#         # Create a swarm plot
+#         sns.stripplot(
+#             x=feature,
+#             y=numerical_feature,
+#             data=subset_data,
+#             palette='viridis',
+#             jitter=True,  # Add jitter for better separation of points
+#             label=f'Type_risk = {type_risk_value}'
+#         )
 
-        # Map x-axis labels for each feature
-        if feature == 'Second_driver':
-            plt.xticks(ticks=[0, 1], labels=[map_x_labels(0), map_x_labels(1)])
-        elif feature == 'Distribution_channel':
-            plt.xticks(ticks=[0, 1], labels=[map_distribution_channel_labels(0), map_distribution_channel_labels(1)])
-        elif feature == 'Payment':
-            plt.xticks(ticks=subset_data['Payment'].unique(), labels=[map_payment_labels(x) for x in subset_data['Payment'].unique()])
+#         # Map x-axis labels for each feature
+#         if feature == 'Second_driver':
+#             plt.xticks(ticks=[0, 1], labels=[map_x_labels(0), map_x_labels(1)])
+#         elif feature == 'Distribution_channel':
+#             plt.xticks(ticks=[0, 1], labels=[map_distribution_channel_labels(0), map_distribution_channel_labels(1)])
+#         elif feature == 'Payment':
+#             plt.xticks(ticks=subset_data['Payment'].unique(), labels=[map_payment_labels(x) for x in subset_data['Payment'].unique()])
 
-        # Add title and labels
-        if (type_risk_value == 1):
-            plt.title(f'Distribution of {numerical_feature} by {feature} for Motorcycles', fontsize=14, pad=20)
-        elif (type_risk_value == 2):
-             plt.title(f'Distribution of {numerical_feature} by {feature} for Vans', fontsize=14, pad=20)
-        elif (type_risk_value == 3):
-             plt.title(f'Distribution of {numerical_feature} by {feature} for Passenger Cars', fontsize=14, pad=20)
-        elif (type_risk_value == 4):
-             plt.title(f'Distribution of {numerical_feature} by {feature} for Argicultular Vehicles', fontsize=14, pad=20)
+#         # Add title and labels
+#         if (type_risk_value == 1):
+#             plt.title(f'Distribution of {numerical_feature} by {feature} for Motorcycles', fontsize=14, pad=20)
+#         elif (type_risk_value == 2):
+#              plt.title(f'Distribution of {numerical_feature} by {feature} for Vans', fontsize=14, pad=20)
+#         elif (type_risk_value == 3):
+#              plt.title(f'Distribution of {numerical_feature} by {feature} for Passenger Cars', fontsize=14, pad=20)
+#         elif (type_risk_value == 4):
+#              plt.title(f'Distribution of {numerical_feature} by {feature} for Argicultular Vehicles', fontsize=14, pad=20)
 
-        plt.xlabel(feature, fontsize=12)
+#         plt.xlabel(feature, fontsize=12)
 
-        plt.ylabel(numerical_feature, fontsize=12)
+#         plt.ylabel(numerical_feature, fontsize=12)
 
-        # # Add legend
-        # plt.legend(title='Type_risk')
+#         # # Add legend
+#         # plt.legend(title='Type_risk')
 
-        # Optional: Add grid lines for better readability
-        plt.grid(True, linestyle='--', alpha=0.6)
+#         # Optional: Add grid lines for better readability
+#         plt.grid(True, linestyle='--', alpha=0.6)
 
-        # Show the plot
-        plt.show()
+#         # Show the plot
+#         plt.show()
 # Loop through each categorical feature and create a swarm plot
 # for feature in categorical_features:
 #     plt.figure(figsize=(12, 8))  # Adjust figure size as needed
