@@ -172,7 +172,7 @@
     \begin{center}
         \includegraphics[width=0.8\textwidth]{images/distributionAll.png}
     \end{center}
-    \caption{Premium και τρόπος πληρωμής} 
+    \caption{Premium και κανάλι διανομής} 
     \label{fig:premium_distribution_channel}   
 \end{figure}
 
@@ -237,7 +237,6 @@
         \texttt{subsample} & 0.7 & 0.8 \\
         \texttt{colsample\_bytree} & 0.7 & 0.8 \\
         \texttt{n\_estimators} & 500 & 1000 \\
-        \texttt{seed} & 42 & 42 \\
         \hline
     \end{tabular}
     \caption{XGBoost Parameter Settings Before and After Tuning}
@@ -249,12 +248,12 @@
         \hline
         & \multicolumn{3}{c}{Before Tuning} & \multicolumn{3}{c}{After Tuning} \\
         \hline
-        & Mean squared error & Average Absolute Error & R² Score & Mean squared error & Average Absolute Error & R² Score \\
+        & Mean squared error & Mean squared error \\
         \hline
-        Motorbikes & 2298.58 & 30.097 & 0.564 & 2228.745 & 29.779 & 0.5779 \\
-        Vans & 8087.68 & 61.148 & 0.367 & 7846.43 & 60.345 & 0.386 \\
-        Passenger Cars & 10776.074 & 69.165 & 0.378 & 10693.593 & 69.07 & 0.383 \\
-        Agricultural Vehicles & 356.954 & 13.416 & -0.266 & 311.899 & 12.15 & -0.1068 \\
+        Motorbikes & 2298.58 & 2228.745  \\
+        Vans & 8087.68 & 7846.43 \\
+        Passenger Cars & 10776.074  & 10693.593 \\
+        Agricultural Vehicles & 356.954 & 311.899\\
         \hline
     \end{tabular}
     \caption{XGBoost Parameter Tuning Results}
@@ -300,8 +299,6 @@
         \texttt{min\_samples\_leaf} & 2 & 2 \\
         \texttt{max\_features} & \texttt{log2} & \texttt{sqrt} \\
         \texttt{bootstrap} & \texttt{False} & \texttt{True} \\
-        \texttt{n\_jobs} & \texttt{-1} & \texttt{-1} \\
-        \texttt{random\_state} & \texttt{42} & \texttt{42} \\
         \hline
     \end{tabular}
     \caption{RandomForest Parameter Settings Before and After Tuning}
@@ -313,12 +310,12 @@
         \hline
         & \multicolumn{3}{c}{Before Tuning} & \multicolumn{3}{c}{After Tuning} \\
         \hline
-        & Mean squared error & Average Absolute Error & R² Score & Mean squared error & Average Absolute Error & R² Score \\
+        & Mean squared error & Mean squared error \\
         \hline
-        Motorbikes & 2380.952 & 30.542 & 0.549 & 2265.092 & 29.42 & 0.571 \\
-        Vans & 8345.571 & 62.057 & 0.3476 & 8184.899 & 61.395 & 0.3601 \\
-        Passenger Cars & 11551.75 & 72.0927 & 0.333 & 10923.639 & 70.2268 & 0.3701 \\
-        Agricultural Vehicles & 282.682 & 11.586 & -0.0032 & 267.008 & 11.477 & 0.0524 \\
+        Motorbikes & 2380.952 & 2265.092 \\
+        Vans & 8345.571 &  8184.899 \\
+        Passenger Cars & 11551.75  & 10923.639 \\
+        Agricultural Vehicles & 282.682  & 267.008 \\
         \hline
     \end{tabular}
     \caption{Random Forest Parameter Tuning Results}
@@ -332,22 +329,6 @@
 με διαφορετικό αριθμό μονάδων, μειώνοντας σταδιακά τους νευρώνες, ενώ χρησιμοποιείται στρώμα dropout για την τυχαία απενεργοποίηση ορισμένων νευρώνων, προλαμβάνοντας το overfitting.\\
 Τα δεδομένα περνούν από τα στρώματα με ενεργοποίηση ReLU και dropout. Το μοντέλο εκπαιδεύεται σε πολλούς κύκλους (epochs) σε παρτίδες (batch\_size), όπου εκτελεί προώθηση (forward pass), υπολογίζει την Loss, 
 και πραγματοποιεί οπισθοδρόμηση (backward pass) για την ενημέρωση των βαρών του μοντέλου. Μετά από κάθε κύκλο εκπαίδευσης, υπολογίζονται μετρήσεις απόδοσης όπως η Μέση Απόλυτη Απόκλιση (MAE) και το R-squared (R2).
-
-\begin{table}[h!]
-    \centering
-    \begin{tabular}{|l|c|c|c|}
-        \hline
-        Vehicle Type & Mean Squared Error & Average Absolute Error & R² Score \\
-        \hline
-        Motorbikes & 3594.674 & 36.799 & 0.3192 \\
-        Vans & 9117.373 & 64.3317 & 0.2872 \\
-        Passenger Cars & 11586.471 & 72.751 & 0.331 \\
-        Agricultural Vehicles & 1375.816 & 29.626 & -3.8825 \\
-        \hline
-    \end{tabular}
-    \caption{Neural Network Performance Metrics}
-\end{table}
-
 
 \section{Oπτικοποίηση και αξιολόγηση αποτελεσμάτων}
 
@@ -414,7 +395,7 @@
     \begin{center}
         \includegraphics[width=1\textwidth]{images/feature_importance_combined_xgb.png}
     \end{center}
-    \caption{Μοντέλο XGBoost που εκπαιδεύτηκε σε όλα τα δεδομένα}  
+    \caption{Σημασία χαρακτηριστικών σε μοντέλο XGBoost που εκπαιδεύτηκε στο σύνολο των δεδεμένων}  
     \label{fig:XGBoost_all_feature_importance}  
 \end{figure}
 
@@ -422,7 +403,7 @@
     \begin{center}
         \includegraphics[width=1\textwidth]{images/feature_importance_combined_random_forest.png}
     \end{center}
-    \caption{Μοντέλο Random Forest που εκπαιδεύτηκε σε όλα τα δεδομένα}  
+    \caption{Σημασία χαρακτηριστικών σε μοντέλο Random Forest που εκπαιδεύτηκε στο σύνολο των δεδεμένων}  
     \label{fig:random_forest_all_feature_importance}  
 \end{figure}
 
@@ -474,7 +455,7 @@ Random Forest καθώς και ότι υπήρχε πολύ χαμηλή ακρ
     \begin{center}
         \includegraphics[width=0.6\textwidth]{images/combined_trained_individual_thresholds_xgb.png}
     \end{center}
-    \caption{Μοντέλο XGBoost που εκπαιδεύτηκε στο σύνολο των δεδομένων ξεχωριστή αξιολόγηση}  
+    \caption{Ξεχωριστή αξιολόγηση ανα κατηγορία σε μοντέλο XGBoost που εκπαιδεύτηκε στο σύνολο των δεδομένων}  
     \label{fig:XGBoost_result_all_individual}  
 \end{figure}
 
@@ -482,7 +463,7 @@ Random Forest καθώς και ότι υπήρχε πολύ χαμηλή ακρ
     \begin{center}
         \includegraphics[width=0.6\textwidth]{images/combined_trained_individual_thresholds_random_forest.png}
     \end{center}
-    \caption{Μοντέλο Random Forest που εκπαιδεύτηκε στο σύνολο των δεδομένων ξεχωριστή αξιολόγηση}  
+    \caption{Ξεχωριστή αξιολόγηση ανα κατηγορία σε μοντέλο Random Forest που εκπαιδεύτηκε στο σύνολο των δεδομένων}  
     \label{fig:random_forest_result_all_individual}  
 \end{figure}
 
@@ -654,6 +635,64 @@ Random Forest καθώς και ότι υπήρχε πολύ χαμηλή ακρ
 ίδια ασφαλιστική πολιτική δεν επηρεάζουν πολύ την τελική τιμή 
 σε σχέση με άλλες παραμέτρους.
 
+\section{Οδηγίες εγκατάστασης}
+
+\subsection{Εγκατάσταση της python και δημιουργία virtual environment}
+
+Για να μπορέσει να λειτουργήσει η εφαρμογή χρειάζεται αρχίκα εγκατάσταση της 
+\href{https://www.python.org/downloads/release/python-3123/}{Python 3.12.2} και μετά την
+δημιουργία ενός virtual environment ωστέ να εγκατασταθούν εκεί οι βιβλιοθήκες της python
+και να μην υπάρχουν συγκρούσεις που προκύπτουν απο διαφορά εκδόσεων.
+Για την δημιουργία του virtual environment δημιουργουμε ένα φάκελο μεσά στον 
+οποίο θα εγκατασταθεί το περιβάλλον και ότι άλλο χρειαστούμε
+για την εφαρμογή (π.χ. ονομάζεται app) και ανοίγουμε ένα τερμάτικό στα Windows 
+και πλοηγούμαστε εκεί. Με την εντολή 
+\begin{verbatim}
+python3 -m venv virt
+\end{verbatim} 
+δημιουργούμε το περιβάλλον και με την εντολή 
+\begin{verbatim}
+virt\Scripts\activate
+\end{verbatim} το ενεργοποιούμε. Με αυτή την εντολή αναβαθμίζουμε και το pip
+\begin{verbatim}
+python.exe -m pip install --upgrade pip
+\end{verbatim}
+
+\subsection{Εγκατάσταση των βιβλιοθηκών απαραίτητων για την εφαρμογή}
+Η εφαρμογή μας για το γραφικό περιβάλλον χρησιμοποιεί kivy το οποίο εγκαθιστούμε με τις 
+εντολές:
+\begin{verbatim}
+git clone https://github.com/kivymd/KivyMD.git --depth 1
+cd KivyMD
+pip install .
+\end{verbatim}
+Για να εγκατασταθούν οι υπόλοιπες απαραίτητες βιβλιοθήκες οι εντολές είναι:
+\begin{verbatim}
+pip install numpy==1.26.4
+pip install pandas==2.2.2
+pip install joblib==1.4.2
+pip install xgboost==2.0.3
+\end{verbatim}
+Για να τρέξει η εφαρμογή πλοηγούμαστε στον φάκελο 
+με τα αρχεία ui και xgboostModels χρησιμοποιούμε την εντολή: 
+\begin{verbatim}
+python ui\front.py
+\end{verbatim}
+και ακολουθούμε τις οδηγίες χρήσης στην επόμενη ενότητα.
+
+\subsection{Εγκατάσταση των βιβλιοθηκών απαραίτητων για τα python scripts και τα γραφήματα}
+Σε περίπτωση που θέλετε να τρέξετε εκτός απο την εφαρμογή και τα scripts με τα μοντέλα μας
+πρέπει να τρέξετε τις εντολές:
+\begin{verbatim}
+pip install torch==2.3.0
+pip install scikit-learn==1.4.2
+pip install matplotlib==3.8.4
+\end{verbatim}
+
+\end{document}
+
+μετά την εγκατάσταση μπορείτε να τρέξετε οποιοδήποτε από τα script και αν δείτε τα διαγράμματα
+
 
 \section{User Interface και Οδηγίες Χρήσης}
 Το user interface της εφαρμογής αναπτύχθηκε με χρήση της Python και ειδικότερα του framework Kivy, καθώς και της συλλογής από γραφικά στοιχεία KivyMD. Στην εφαρμογή μας υπάρχουν πέντε διαφορετικές "οθόνες":
@@ -817,60 +856,3 @@ Random Forest καθώς και ότι υπήρχε πολύ χαμηλή ακρ
 Σε περίπτωση που η ημερομηνία επόμενης ανανέωσης συμβολαίου μείνει 
 καινή θα συμπληρωθεί η  ημερομηνία ένα χρόνο μετά απο την ημερομηνία τελευταίας ανανέωσης.
 
-\section{Οδηγίες εγκατάστασης}
-
-\subsection{Εγκατάσταση της python και δημιουργία virtual environment}
-
-Για να μπορέσει να λειτουργήσει η εφαρμογή χρειάζεται αρχίκα εγκατάσταση της 
-\href{https://www.python.org/downloads/release/python-3123/}{Python 3.12.2} και μετά την
-δημιουργία ενός virtual environment ωστέ να εγκατασταθούν εκεί οι βιβλιοθήκες της python
-και να μην υπάρχουν συγκρούσεις που προκύπτουν απο διαφορά εκδόσεων.
-Για την δημιουργία του virtual environment δημιουργουμε ένα φάκελο μεσά στον 
-οποίο θα εγκατασταθεί το περιβάλλον και ότι άλλο χρειαστούμε
-για την εφαρμογή (π.χ. ονομάζεται app) και ανοίγουμε ένα τερμάτικό στα Windows 
-και πλοηγούμαστε εκεί. Με την εντολή 
-\begin{verbatim}
-python3 -m venv virt
-\end{verbatim} 
-δημιουργούμε το περιβάλλον και με την εντολή 
-\begin{verbatim}
-virt\Scripts\activate
-\end{verbatim} το ενεργοποιούμε. Με αυτή την εντολή αναβαθμίζουμε και το pip
-\begin{verbatim}
-python.exe -m pip install --upgrade pip
-\end{verbatim}
-
-\subsection{Εγκατάσταση των βιβλιοθηκών απαραίτητων για την εφαρμογή}
-Η εφαρμογή μας για το γραφικό περιβάλλον χρησιμοποιεί kivy το οποίο εγκαθιστούμε με τις 
-εντολές:
-\begin{verbatim}
-git clone https://github.com/kivymd/KivyMD.git --depth 1
-cd KivyMD
-pip install .
-\end{verbatim}
-Για να εγκατασταθούν οι υπόλοιπες απαραίτητες βιβλιοθήκες οι εντολές είναι:
-\begin{verbatim}
-pip install numpy==1.26.4
-pip install pandas==2.2.2
-pip install joblib==1.4.2
-pip install xgboost==2.0.3
-\end{verbatim}
-Για να τρέξει η εφαρμογή πλοηγούμαστε στον φάκελο 
-με τα αρχεία ui και xgboostModels χρησιμοποιούμε την εντολή: 
-\begin{verbatim}
-python ui\front.py
-\end{verbatim}
-και ακολουθούμε τις οδηγίες χρήσης στην επόμενη ενότητα.
-
-\subsection{Εγκατάσταση των βιβλιοθηκών απαραίτητων για τα python scripts και τα γραφήματα}
-Σε περίπτωση που θέλετε να τρέξετε εκτός απο την εφαρμογή και τα scripts με τα μοντέλα μας
-πρέπει να τρέξετε τις εντολές:
-\begin{verbatim}
-pip install torch==2.3.0
-pip install scikit-learn==1.4.2
-pip install matplotlib==3.8.4
-\end{verbatim}
-
-\end{document}
-
-μετά την εγκατάσταση μπορείτε να τρέξετε οποιοδήποτε από τα script και αν δείτε τα διαγράμματα
