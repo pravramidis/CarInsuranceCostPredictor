@@ -185,7 +185,6 @@ def train_model(model, criterion, optimizer, train_loader, epochs):
             predictions.extend(outputs.cpu().detach().numpy())
             targets.extend(labels.cpu().detach().numpy())
 
-        # Calculate and print metrics
         mean_mae = mean_absolute_error(targets, predictions)
         r2 = r2_score(targets, predictions)
         print(f"Epoch {epoch + 1}/{epochs}, Loss: {running_loss / len(train_loader):.4f}, MAE: {mean_mae:.4f}, R-squared: {r2:.4f}")

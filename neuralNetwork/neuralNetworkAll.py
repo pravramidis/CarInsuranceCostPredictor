@@ -34,6 +34,7 @@ contract_day = pd.to_datetime(data['Date_start_contract'], format='%d/%m/%Y')
 contract_year = contract_day.dt.year
 data['Contract_year'] = contract_year
 
+#Removes the multiple entries for the same contract by keeping only the most recent
 avg_premium_per_id = data.groupby('ID')['Premium'].mean().reset_index()
 data = data.merge(avg_premium_per_id, on='ID', suffixes=('', '_avg'))
 data['Premium'] = data['Premium_avg']
