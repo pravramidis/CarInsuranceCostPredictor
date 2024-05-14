@@ -6,7 +6,6 @@ import xgboost as xgb
 def makePrediction(input):
 
     type_risk_value = input['vehicle_screen']['vehicle_type']
-    # print(input)
 
     data = pd.DataFrame(columns=['Seniority', 'Area', 'Second_driver', 'Years_on_road', 'R_Claims_history', 
                               'Years_on_policy', 'accidents', 'Value_vehicle', 'Age', 'Years_driving', 
@@ -178,20 +177,14 @@ def makePrediction(input):
 
     loaded_model = xgb.Booster(model_file=f"xgbModels\\model_{type_risk_value}.json")
 
-    # Load the preprocessor corresponding to your model
     loaded_preprocessor = joblib.load(f"xgbModels\\preprocessor_{type_risk_value}.pkl")
 
-
-    # Transform new data using the loaded preprocessor
     new_data_preprocessed = loaded_preprocessor.transform(data)
 
     new_data_dmatrix = xgb.DMatrix(new_data_preprocessed)
 
-    # Make prediction using the loaded model
     prediction = loaded_model.predict(new_data_dmatrix)
 
-
-    # Print the prediction
     print("Predicted Premium:", prediction)
 
     return prediction

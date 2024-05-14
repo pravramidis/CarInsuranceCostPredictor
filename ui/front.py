@@ -32,7 +32,6 @@ class DatePickerMixin:
             self.date_dialog = MDDockedDatePicker()
             self.date_dialog.bind(on_ok=self.on_ok, on_cancel=self.on_cancel)
         
-        # Positioning the dialog based on the widget's properties
         self.date_dialog.pos = [
             widget.center_x - self.date_dialog.width / 2,
             widget.y - (self.date_dialog.height - dp(142))
@@ -72,7 +71,6 @@ class DropdownMenuMixin:
         text_field.text = text
         menu.dismiss()
 
-#Define different screens
 class LoginScreen(Screen):
     def __init__(self, **kwargs):
         super(LoginScreen, self).__init__(**kwargs)
@@ -128,7 +126,6 @@ class MainScreen(Screen, DatePickerMixin, DropdownMenuMixin):
    
     
     def on_leave(self):
-        # Make sure to clean up by dismissing the menu if it's open
         if self.menu:
             self.menu.dismiss()
     
@@ -145,7 +142,7 @@ class MainScreen(Screen, DatePickerMixin, DropdownMenuMixin):
             
 
     def on_text_field_focus(self, instance, value):
-        if value:  # if the text field is focused
+        if value:  
             self.show_date_picker(instance,value)
     
     def date_of_birth(self):
@@ -231,7 +228,7 @@ class InsuranceScreen(Screen, DatePickerMixin, DropdownMenuMixin):
         self.add_widget(fl)
 
     def on_text_field_focus(self, instance, value):
-        if value:  # if the text field is focused
+        if value: 
             self.show_date_picker(instance,value)
     
     def on_dropdown_focus(self, instance, value):
@@ -296,7 +293,7 @@ class PriceScreen(Screen):
         prediction = eval.makePrediction(data)
         
 
-        # Round float to two decimal places
+        
         rounded_prediction = np.round(prediction, 2)
         premium = self.ids.premium
         premium.text = str(rounded_prediction)[1:-1] + " €"
@@ -354,7 +351,6 @@ class SafeWheels(MDApp):
         price_screen = self.root.get_screen("price")
         price_screen.receive_data(data)
 
-        # Navigate to the PriceScreen
         self.root.current = "price"
 
 
