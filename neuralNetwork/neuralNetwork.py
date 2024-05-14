@@ -156,14 +156,12 @@ class NeuralNet(nn.Module):
 
 embedding_sizes = [(len(data[column].unique()) + 1, min(50, (len(data[column].unique()) + 1) // 2)) for column in categoricalColumns]
 
-# Initialize the neural network
 input_size = len(numericalColumns) + sum(embedding_size for _, embedding_size in embedding_sizes)
-output_size = 1  # For regression
-criterion = nn.MSELoss()  # Mean Squared Error loss for regression
-
+output_size = 1  
+criterion = nn.MSELoss()  
 
 def train_model(model, criterion, optimizer, train_loader, epochs):
-    model.train()  # Set the model to training mode
+    model.train()  #
     for epoch in range(epochs):
         running_loss = 0.0
         predictions = []
@@ -192,31 +190,23 @@ def train_model(model, criterion, optimizer, train_loader, epochs):
         r2 = r2_score(targets, predictions)
         print(f"Epoch {epoch + 1}/{epochs}, Loss: {running_loss / len(train_loader):.4f}, MAE: {mean_mae:.4f}, R-squared: {r2:.4f}")
 
-# Define evaluation function
 def evaluate_model(model, X_test, y_test, risk_type):
-    model.eval()  # Set the model to evaluation mode
+    model.eval()  
     with torch.no_grad():
-        # Split the features into numerical and categorical components
         numerical_features = X_test[:, :len(numericalColumns)]
         categorical_features = X_test[:, len(numericalColumns):]
 
-        # Convert the numerical and categorical features directly to PyTorch tensors
         numerical_tensor = torch.tensor(numerical_features, dtype=torch.float32, device=device)
         categorical_tensor = torch.tensor(categorical_features, dtype=torch.long, device=device)
 
-        # Pass both numerical and categorical inputs to the model
         outputs = model(numerical_tensor, categorical_tensor)
 
-        # Convert y_test to a PyTorch tensor
         y_test_tensor = torch.tensor(y_test.values, dtype=torch.float32, device=device)
 
 
-
-        # Calculate Mean Squared Error
         mse = criterion(outputs, y_test_tensor.unsqueeze(1))
         print(f"Mean Squared Error on Test Set: {mse.item()}")
 
-        # Calculate Mean Absolute Error
         mae = mean_absolute_error(y_test, outputs.cpu().numpy())
         print(f"Mean Absolute Error on Test Set: {mae}")
         type_defined = definition_of_type_risk(risk_type)
@@ -226,7 +216,6 @@ def evaluate_model(model, X_test, y_test, risk_type):
         print()
 
         threshold_values = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
-        # Calculate percentage within threshold
         percentages_within_threshold = []
         for threshold in threshold_values:
             absolute_errors = np.abs(outputs.cpu().numpy() - y_test.values)
@@ -237,58 +226,44 @@ def evaluate_model(model, X_test, y_test, risk_type):
         return percentages_within_threshold
 
 
-# Get unique values of 'Type_risk' column
 risk_types = data['Type_risk'].unique()
 
-# Dictionary to store models and corresponding datasets
 models = {}
 datasets = {}
 
-# Loop through each risk type
 for risk_type in risk_types:
-    # Filter data based on risk type
     risk_data = data[data['Type_risk'] == risk_type]
     
-    # Separate features and labels
     risk_features = risk_data.drop(columns=['Premium'])
     risk_labels = risk_data['Premium']
     
-    # Preprocess features
     risk_features_preprocessed = preprocessor.transform(risk_features)
     
-    # Split into train and test sets
     X_train_risk, X_test_risk, y_train_risk, y_test_risk = train_test_split(
         risk_features_preprocessed, risk_labels, test_size=0.2, random_state=42)
     
-    # Create TensorDatasets
     train_dataset_risk = TensorDataset(
         torch.tensor(X_train_risk, dtype=torch.float32, device=device),
         torch.tensor(y_train_risk.values, dtype=torch.float32, device=device).unsqueeze(1)
     )
     
-    # Save dataset
     datasets[risk_type] = (train_dataset_risk, X_test_risk, y_test_risk)
     
-    # Initialize and train model
     model_risk = NeuralNet(input_size, len(numericalColumns), categoricalColumns, risk_data, output_size).to(device)
     optimizer_risk = optim.Adam(model_risk.parameters(), lr=0.001)
     train_model(model_risk, criterion, optimizer_risk, DataLoader(train_dataset_risk, batch_size=batch_size, shuffle=True), epochs)
     
-    # Save trained model
     models[risk_type] = model_risk
 
 
-# Initialize a list to store risk_type-specific data for plotting
 plots_data = []
 
-# Evaluate each model and collect data for plotting
 for risk_type, (train_dataset_risk, X_test_risk, y_test_risk) in datasets.items():
     print(f"Evaluating model for risk type: {risk_type}")
     percentages_within_threshold = evaluate_model(models[risk_type], X_test_risk, y_test_risk, risk_type)
     plots_data.append((risk_type,percentages_within_threshold))
     
 threshold_values = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
-# Plotting all graphs together
 plt.figure(figsize=(12, 8))
 for risk_type, percentages_within_threshold in plots_data:
     type_defined = definition_of_type_risk(risk_type)
