@@ -19,6 +19,7 @@ import joblib
 
 #using gpu
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
 def definition_of_type_risk(number):
     if number == 1:
         return "Motorbike"
