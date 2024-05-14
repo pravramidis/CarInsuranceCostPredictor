@@ -29,7 +29,7 @@ ScreenManager:
             size_hint_y: None
             size_hint_x: None
             width: self.parent.width - dp(50)
-            height: self.parent.height -  dp(350)  # Adjust the height to stay within the card
+            height: self.parent.height -  dp(350) 
              
             
         Widget:
@@ -133,9 +133,8 @@ ScreenManager:
                     cols: 2
                     size_hint: 1, None
                     adaptive_height: True
-                    padding: [10, 40]  # padding: [horizontal, vertical]
-                    spacing: [20, 40]  # Increase vertical spacing
-                
+                    padding: [10, 40]   
+                    spacing: [20, 40]  
                     pos_hint: {'center_x': 0.5, "center_y": 0.45}
                     
                     MDTextField:
@@ -200,7 +199,7 @@ ScreenManager:
                 BoxLayout:
                     orientation: 'horizontal'
                     size_hint_y: None
-                    height: dp(50)  # Adjust the height as needed to fit the card
+                    height: dp(50)   
                     spacing: 40
                     padding: 40
                     pos_hint: {'center_x': 0.65, "center_y": 0.5}
@@ -277,8 +276,8 @@ ScreenManager:
                     cols: 3
                     size_hint: 1, None
                     adaptive_height: True
-                    padding: [10, 40]  # padding: [horizontal, vertical]
-                    spacing: [20, 40]  # Increase vertical spacing
+                    padding: [10, 40] 
+                    spacing: [20, 40] 
                 
                     pos_hint: {'center_x': 0.5, "center_y": 0.45}
                 
@@ -390,7 +389,7 @@ ScreenManager:
                 BoxLayout:
                     orientation: 'horizontal'
                     size_hint_y: None
-                    height: dp(50)  # Adjust the height as needed to fit the card
+                    height: dp(50) 
                     spacing: 40
                     padding: 40
                     pos_hint: {'center_x': 0.65, "center_y": 0.5}
@@ -463,8 +462,8 @@ ScreenManager:
                     cols: 3
                     size_hint: 1, None
                     adaptive_height: True
-                    padding: [10, 30]  # padding: [horizontal, vertical]
-                    spacing: [20, 30]  # Increase vertical spacing
+                    padding: [10, 30]  
+                    spacing: [20, 30]  
                 
                     pos_hint: {'center_x': 0.5, "center_y": 0.45}
                 
@@ -593,7 +592,7 @@ ScreenManager:
                 BoxLayout:
                     orientation: 'horizontal'
                     size_hint_y: None
-                    height: dp(60)  # Adjust the height as needed to fit the card
+                    height: dp(60)  
                     spacing: 40
                     padding: 40
                     pos_hint: {'center_x': 0.65, "center_y": 0.5}
@@ -651,7 +650,7 @@ ScreenManager:
                 MDLabel:
                     text: "Suggested Premium"
                     font_style: "Display"
-                    role: "small"  # Adjust the font style as needed for larger text
+                    role: "small"  
                     halign: "center"
                     size_hint_y: None
                     height: self.texture_size[1]
@@ -661,7 +660,7 @@ ScreenManager:
                     id: premium
                     text: "$"
                     font_style: "Display"
-                    role: "small"  # Adjust the font style as needed for larger text
+                    role: "small"  
                     halign: "center"
                     size_hint_y: None
                     height: self.texture_size[1]
@@ -672,7 +671,7 @@ ScreenManager:
                 BoxLayout:
                     orientation: 'horizontal'
                     size_hint_y: None
-                    height: dp(50)  # Adjust the height as needed to fit the card
+                    height: dp(50)  
                     spacing: 40
                     padding: 40
                     pos_hint: {'center_x': 0.65, "center_y": 0.3}
