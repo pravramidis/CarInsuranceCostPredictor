@@ -20,7 +20,6 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 filename = "Motor_vehicle_insurance_data.csv"
 
-# Reading the CSV file
 data = pd.read_csv(filename, sep=';')
 
 def definition_of_type_risk(number):
@@ -34,6 +33,7 @@ def definition_of_type_risk(number):
         return "Agricultural Vehicle"
     else:
         return "All"
+    
 # Feature engineering
 last_renewal_day = pd.to_datetime(data['Date_last_renewal'], format='%d/%m/%Y')
 last_renewal_year = last_renewal_day.dt.year
@@ -46,6 +46,7 @@ contract_day = pd.to_datetime(data['Date_start_contract'], format='%d/%m/%Y')
 contract_year = contract_day.dt.year
 data['Contract_year'] = contract_year
 
+#Removes the multiple entries for the same contract by keeping only the most recent
 avg_premium_per_id = data.groupby('ID')['Premium'].mean().reset_index()
 data = data.merge(avg_premium_per_id, on='ID', suffixes=('', '_avg'))
 data['Premium'] = data['Premium_avg']
@@ -67,9 +68,6 @@ data['Years_on_road'] = last_renewal_year - registration_year
 next_renewal_day = pd.to_datetime(data['Date_next_renewal'], format='%d/%m/%Y')
 next_renewal_year = next_renewal_day.dt.year
 data['Next_renewal_year'] = next_renewal_year
-
-policy_duration = next_renewal_year - last_renewal_year
-data['Policy_duration'] = policy_duration
 
 years_on_policy = last_renewal_year - contract_year
 data['Years_on_policy'] = years_on_policy
@@ -111,19 +109,16 @@ class NeuralNet(nn.Module):
         super(NeuralNet, self).__init__()
         self.num_numerical_cols = num_numerical_cols
         
-        # Initialize the embeddings
         self.embeddings = nn.ModuleList()
         for column in categorical_columns:
-            num_unique_values = len(data[column].unique()) + 1  # Adding 1 for unknown category
+            num_unique_values = len(data[column].unique()) + 1
             embedding_size = min(50, (num_unique_values + 1) // 2)  
             self.embeddings.append(nn.Embedding(num_unique_values, embedding_size))
         
         self.num_categorical_cols = sum(e.embedding_dim for e in self.embeddings)
         
-        # Total number of input features
         total_input_size = self.num_numerical_cols + self.num_categorical_cols
         
-        # Define fully connected layers
         self.fc1 = nn.Linear(total_input_size, 256)
         self.fc2 = nn.Linear(256, 128)
         self.fc3 = nn.Linear(128, 64)
@@ -131,27 +126,20 @@ class NeuralNet(nn.Module):
         self.fc5 = nn.Linear(32, 16)
         self.fc6 = nn.Linear(16, output_size)
         
-        # Dropout layer
         self.dropout = nn.Dropout(0.2)
 
     def forward(self, x_numerical, x_categorical):
-        # Convert categorical data to LongTensor
         x_categorical = x_categorical.long()
         
-        # Process categorical input through the embedding layers
         embedded = []
         for i, embedding in enumerate(self.embeddings):
-            # Process each categorical column through the corresponding embedding layer
-            cat_col = x_categorical[:, i]  # Select the i-th categorical column
+            cat_col = x_categorical[:, i]
             embedded.append(embedding(cat_col))
         
-        # Concatenate all embedded categorical features
         x_categorical = torch.cat(embedded, dim=1)
-        
-        # Concatenate numerical and categorical features
+    
         x = torch.cat([x_numerical, x_categorical], dim=1)
         
-        # Pass through the fully connected layers
         x = F.relu(self.fc1(x))
         x = self.dropout(x)
         x = F.relu(self.fc2(x))
@@ -166,7 +154,6 @@ class NeuralNet(nn.Module):
         
         return x
 
-# Define the sizes for embedding layers
 embedding_sizes = [(len(data[column].unique()) + 1, min(50, (len(data[column].unique()) + 1) // 2)) for column in categoricalColumns]
 
 # Initialize the neural network
@@ -174,7 +161,7 @@ input_size = len(numericalColumns) + sum(embedding_size for _, embedding_size in
 output_size = 1  # For regression
 criterion = nn.MSELoss()  # Mean Squared Error loss for regression
 
-# Define training loop
+
 def train_model(model, criterion, optimizer, train_loader, epochs):
     model.train()  # Set the model to training mode
     for epoch in range(epochs):
@@ -182,23 +169,18 @@ def train_model(model, criterion, optimizer, train_loader, epochs):
         predictions = []
         targets = []
         for inputs, labels in train_loader:
-            # Split inputs into numerical and categorical parts
             inputs_numerical = inputs[:, :len(numericalColumns)].to(device)
             inputs_categorical = inputs[:, len(numericalColumns):].to(device)
             labels = labels.to(device)
 
-            # Zero the parameter gradients
             optimizer.zero_grad()
             
-            # Forward pass
             outputs = model(inputs_numerical, inputs_categorical)
             loss = criterion(outputs, labels)
             
-            # Backward pass and optimize
             loss.backward()
             optimizer.step()
             
-            # Accumulate running loss
             running_loss += loss.item()
             
             # Collect predictions and targets for metrics
